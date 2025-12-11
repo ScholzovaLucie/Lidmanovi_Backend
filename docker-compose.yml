@@ -1,5 +1,6 @@
 services:
   backend:
+    command: python manage.py runserver 0.0.0.0:8000
     build:
       context: .
       dockerfile: Dockerfile
@@ -17,9 +18,9 @@ services:
     image: postgres:16
     container_name: postgres
     environment:
-      POSTGRES_DB: lidmanovi
-      POSTGRES_USER: lidmanovi
-      POSTGRES_PASSWORD: lidmanovi
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:

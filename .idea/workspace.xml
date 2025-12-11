@@ -4,34 +4,97 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4076d1dc-b495-4c7b-b9e5-aa6c6863e9cb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/DjangoProject.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/db/init.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/entrypoint.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+    <list default="true" id="4076d1dc-b495-4c7b-b9e5-aa6c6863e9cb" name="Changes" comment="init models">
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/data_source_mapping.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/guest/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/iframe_embed/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/info_box/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media_file/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/order/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/order_item/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/package/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/package_sale/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/package_service/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/page/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/price_rule/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rate_plan/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/reservation/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/room/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/room/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/room_type/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sale/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user/serializers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/DjangoProject.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/DjangoProject.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lidmanovi_Backend/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Lidmanovi_Backend/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lidmanovi_Backend/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Lidmanovi_Backend/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/guest/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/guest/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/guest/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/guest/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iframe_embed/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/iframe_embed/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/info_box/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/info_box/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/media_file/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_file/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/order/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/order/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/order_item/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/order_item/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/package/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package_sale/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/package_sale/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package_service/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/package_service/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/page/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/page/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/price_rule/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/price_rule/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rate_plan/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/rate_plan/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reservation/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/reservation/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/room/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/room/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/room/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/room/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/room_type/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/room_type/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sale/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/sale/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/migrations/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/room/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Dockerfile" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Scholzova"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/ScholzovaLucie/Lidmanovi_Backend.git",
+    "accountId": "ed3b985e-5b4a-4a68-becb-c4c88cbcff5b"
+  }
+}]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 0
 }]]></component>
@@ -42,16 +105,21 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Django Server.lidmanovi.executor": "Run",
+    "Docker.docker-compose.yml.db: Compose Deployment.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "dev",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -60,6 +128,60 @@
     ]
   }
 }]]></component>
+  <component name="RunManager" selected="Docker.docker-compose.yml.db: Compose Deployment">
+    <configuration name="lidmanovi" type="Python.DjangoServer" factoryName="Django server">
+      <module name="DjangoProject" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="DJANGO_SETTINGS_MODULE" value="Lidmanovi_Backend.settings" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Remote Python 3.11.14 Docker Compose (backend)" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="port" value="8000" />
+      <option name="host" value="" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="false" />
+      <option name="useCustomRunCommand" value="false" />
+      <option name="customRunCommand" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml" />
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml.db: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="db" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Django Server.lidmanovi" />
+      <item itemvalue="Docker.docker-compose.yml.db: Compose Deployment" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Docker.docker-compose.yml.db: Compose Deployment" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="4076d1dc-b495-4c7b-b9e5-aa6c6863e9cb" name="Changes" comment="" />
@@ -67,11 +189,33 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1765223678710</updated>
-      <workItem from="1765223679773" duration="1736000" />
+      <workItem from="1765223679773" duration="8265000" />
     </task>
+    <task id="LOCAL-00001" summary="init">
+      <option name="closed" value="true" />
+      <created>1765225629390</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1765225629391</updated>
+    </task>
+    <task id="LOCAL-00002" summary="init models">
+      <option name="closed" value="true" />
+      <created>1765225664852</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1765225664852</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="init" />
+    <MESSAGE value="init models" />
+    <option name="LAST_COMMIT_MESSAGE" value="init models" />
   </component>
 </project>
