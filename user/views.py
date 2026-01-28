@@ -154,3 +154,5 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
 
         return Response({"detail": "Password has been reset successfully."})
+
+
