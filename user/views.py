@@ -3,7 +3,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from django.contrib.auth.models import User
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -23,14 +23,9 @@ token_generator = PasswordResetTokenGenerator()
 
 
 @extend_schema_view(
-    list=extend_schema(tags=["Users"]),
     retrieve=extend_schema(tags=["Users"]),
-    create=extend_schema(tags=["Users"]),
-    update=extend_schema(tags=["Users"]),
-    partial_update=extend_schema(tags=["Users"]),
-    destroy=extend_schema(tags=["Users"]),
 )
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 

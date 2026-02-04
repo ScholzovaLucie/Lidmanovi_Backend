@@ -2,16 +2,8 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 from pension.guest.models import Guest
+from pension.reservation.enums import ReservationStatus
 from pension.room.models import Room
-
-
-class ReservationStatus(models.TextChoices):
-    NEW = "new", "New"
-    CONFIRMED = "confirmed", "Confirmed"
-    CANCELLED = "cancelled", "Cancelled"
-    PAYMENT_PENDING = "payment_pending", "Payment pending"
-    PAYED = "payed", "Payed"
-    DONE = "done", "Done"
 
 
 class Reservation(models.Model):
@@ -35,7 +27,8 @@ class Reservation(models.Model):
     primary_guest = models.ForeignKey(
         Guest,
         on_delete=models.PROTECT,
-        related_name="reservations"
+        related_name="reservations",
+        help_text="The primary guest who will receive the reservation",
     )
 
     room = models.ForeignKey(

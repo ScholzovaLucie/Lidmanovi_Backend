@@ -1,0 +1,17 @@
+<h2>Rezervace nebyla schválena</h2>
+
+<p>Dobrý den {{ name }},</p>
+
+<p>
+Bohužel vaši rezervaci nemůžeme v požadovaném termínu potvrdit.
+</p>
+
+{% if reason %}
+<p><strong>Důvod:</strong> {{ reason }}</p>
+{% endif %}
+
+<p>
+Doporučujeme zkusit jiný termín.
+</p>
+
+<p>S pozdravem<br>Restaurace u Lidmanů</p>
