@@ -87,6 +87,17 @@ class RoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.Gen
         adults = int(request.query_params.get('adults', 1))
         children = int(request.query_params.get('children', 0))
 
+        if not from_date or not to_date:
+            return Response({"error": "from_date and to_date are required"}, status=400)
+        if adults < 1:
+            return Response({"error": "adults must be at least 1"}, status=400)
+        if children < 0:
+            return Response({"error": "children must be at least 0"}, status=400)
+
+        if to_date <= from_date:
+            return Response({"error": "to_date must be greater than from_date"},status=400)
+
+
         available = room.is_available(from_date, to_date, adults, children)
 
         return Response({

@@ -4,16 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4076d1dc-b495-4c7b-b9e5-aa6c6863e9cb" name="Changes" comment="update environment variables and configuration settings">
-      <change beforePath="$PROJECT_DIR$/.idea/data_source_mapping.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="4076d1dc-b495-4c7b-b9e5-aa6c6863e9cb" name="Changes" comment="add email service, enhance room reservations logic, and update environment configuration">
+      <change afterPath="$PROJECT_DIR$/tests/pension/reservations/test_reservation_endpoints.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/pension/reservations/test_reservation_logic.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/pension/rooms/test_room_endpoints.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/pension/rooms/test_room_logic.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lidmanovi_Backend/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Lidmanovi_Backend/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lidmanovi_Backend/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Lidmanovi_Backend/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pension/reservation/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/pension/reservation/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pension/reservation/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/pension/reservation/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pension/room/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/pension/room/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/conftest.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,12 +27,14 @@
     <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
   </component>
   <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="4938" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Dockerfile" />
+        <option value="HTML File" />
         <option value="Python Script" />
       </list>
     </option>
@@ -73,9 +73,13 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
     "Django Server.lidmanovi.executor": "Debug",
     "Docker.docker-compose.yml.db: Compose Deployment.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python tests.pytest for pension.reservations.test_reservation_endpoints.test_create_reservation.executor": "Debug",
+    "Python tests.pytest for tests.pension.reservations.test_reservation_endpoints.test_create_reservation.executor": "Debug",
+    "Python tests.pytest.executor": "Debug",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -104,7 +108,7 @@
     ]
   }
 }]]></component>
-  <component name="RunManager" selected="Django Server.lidmanovi">
+  <component name="RunManager" selected="Python tests.pytest">
     <configuration name="lidmanovi" type="Python.DjangoServer" factoryName="Django server">
       <module name="DjangoProject" />
       <option name="ENV_FILES" value="" />
@@ -115,9 +119,8 @@
         <env name="DJANGO_SETTINGS_MODULE" value="Lidmanovi_Backend.settings" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Remote 3.11 Docker Compose (backend)" />
       <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="RUN_TOOL" value="" />
@@ -151,12 +154,59 @@
       </deployment>
       <method v="2" />
     </configuration>
+    <configuration name="pytest for pension.reservations.test_reservation_endpoints.test_create_reservation" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="DjangoProject" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="DJANGO_SETTINGS_MODULE" value="Lidmanovi_Backend.settings_dev" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;--reuse-db&quot;" />
+      <option name="_new_target" value="&quot;pension.reservations.test_reservation_endpoints.test_create_reservation&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest" type="tests" factoryName="py.test" nameIsGenerated="true">
+      <module name="DjangoProject" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="DJANGO_SETTINGS_MODULE" value="Lidmanovi_Backend.settings_dev" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;--reuse-db&quot;" />
+      <option name="_new_target" value="&quot;&quot;" />
+      <option name="_new_targetType" value="&quot;CUSTOM&quot;" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Django Server.lidmanovi" />
       <item itemvalue="Docker.docker-compose.yml.db: Compose Deployment" />
+      <item itemvalue="Python tests.pytest" />
+      <item itemvalue="Python tests.pytest for pension.reservations.test_reservation_endpoints.test_create_reservation" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.pytest for pension.reservations.test_reservation_endpoints.test_create_reservation" />
         <item itemvalue="Docker.docker-compose.yml.db: Compose Deployment" />
       </list>
     </recent_temporary>
@@ -171,7 +221,9 @@
       <workItem from="1765223679773" duration="8265000" />
       <workItem from="1767972659926" duration="1744000" />
       <workItem from="1769264572922" duration="1499000" />
-      <workItem from="1769598408978" duration="7682000" />
+      <workItem from="1769598408978" duration="9553000" />
+      <workItem from="1770134532517" duration="21998000" />
+      <workItem from="1770279645441" duration="1646000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
@@ -197,7 +249,23 @@
       <option name="project" value="LOCAL" />
       <updated>1767972721358</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="update">
+      <option name="closed" value="true" />
+      <created>1769615885030</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1769615885031</updated>
+    </task>
+    <task id="LOCAL-00005" summary="add email service, enhance room reservations logic, and update environment configuration">
+      <option name="closed" value="true" />
+      <created>1770203576688</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1770203576688</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -207,7 +275,34 @@
     <MESSAGE value="init" />
     <MESSAGE value="init models" />
     <MESSAGE value="update environment variables and configuration settings" />
-    <option name="LAST_COMMIT_MESSAGE" value="update environment variables and configuration settings" />
+    <MESSAGE value="update" />
+    <MESSAGE value="add email service, enhance room reservations logic, and update environment configuration" />
+    <option name="LAST_COMMIT_MESSAGE" value="add email service, enhance room reservations logic, and update environment configuration" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/emails/services.py</url>
+          <line>41</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/emails/services.py</url>
+          <line>49</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/pension/rooms/test_room_endpoints.py</url>
+          <line>99</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/LidmanoviProject$pytest.coverage" NAME="pytest Coverage Results" MODIFIED="1770366023234" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/LidmanoviProject$pytest_for_tests_pension_reservations_test_reservation_endpoints_test_create_reservation.coverage" NAME="pytest for pension.reservations.test_reservation_endpoints.test_create_reservation Coverage Results" MODIFIED="1770200097943" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

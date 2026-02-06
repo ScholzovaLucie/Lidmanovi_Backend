@@ -23,6 +23,7 @@ def auth_client(staff_user):
 @pytest.fixture
 def room():
     return Room.objects.create(
+        id=1,
         capacity=4,
         max_children=2,
         max_adults=2,
