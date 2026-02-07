@@ -18,6 +18,8 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
     permission_classes = []
+    http_method_names = ['get']
+
 
     @extend_schema(
         tags=['Rooms'],
@@ -71,7 +73,7 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
             check_out_date__gte=from_date,
         )
 
-        reserved_ids = reservations.values_list('room_id', flat=True)
+        reserved_ids = reservations.values_list('rooms__id', flat=True)
 
         rooms = self.get_queryset().exclude(id__in=reserved_ids)
 

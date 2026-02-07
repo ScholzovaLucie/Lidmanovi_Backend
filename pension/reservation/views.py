@@ -2,6 +2,7 @@ from random import choices
 
 from drf_spectacular.plumbing import build_basic_type
 from rest_framework import viewsets, decorators, mixins
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
 from pension.reservation.models import Reservation, ReservationStatus
@@ -17,11 +18,55 @@ from pension.reservation.serializers import (
 
 
 @extend_schema_view(
+)
+class PublicReservationViewSet(viewsets.GenericViewSet):
+    queryset = Reservation.objects.all()
+    permission_classes = []
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return ReservationCreateSerializer
+        return ReservationReadSerializer
+
+    @extend_schema(
+        tags=['Reservations'],
+        request=ReservationCreateSerializer,
+        responses=ReservationReadSerializer(many=True),
+    )
+    @decorators.action(detail=False, methods=['post'], url_path='create')
+    def create_reservation(self, request):
+        serializer = ReservationCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        reservation = serializer.save()
+
+        read_serializer = ReservationReadSerializer(reservation)
+        return Response(read_serializer.data)
+
+
+    @extend_schema(
+        tags=['Reservations'],
+        responses=OpenApiTypes.OBJECT,
+    )
+    @decorators.action(detail=False, methods=['get'], url_path='statuses')
+    def get_statuses(self, request):
+        data = [
+            {
+                "value": choice[0],
+                "label": choice[1],
+            }
+            for choice in ReservationStatus.choices
+        ]
+        return Response(data)
+
+
+@extend_schema_view(
     list=extend_schema(tags=['Reservations']),
     retrieve=extend_schema(tags=['Reservations']),
 )
-class ReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Reservation.objects.all()
+    permission_classes = [IsAdminUser]
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -84,19 +129,6 @@ class ReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, views
 
     @extend_schema(
         tags=['Reservations'],
-        request=ReservationCreateSerializer,
-        responses=ReservationReadSerializer(many=True),
-    )
-    @decorators.action(detail=False, methods=['post'], url_path='create')
-    def create_reservation(self, request):
-        serializer = ReservationCreateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(serializer.data)
-
-    @extend_schema(
-        tags=['Reservations'],
         request=ReservationUpdateSerializer,
         responses=ReservationReadSerializer,
     )
@@ -116,18 +148,3 @@ class ReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, views
 
         read_serializer = ReservationReadSerializer(reservation)
         return Response(read_serializer.data)
-
-    @extend_schema(
-        tags=['Reservations'],
-        responses=OpenApiTypes.OBJECT,
-    )
-    @decorators.action(detail=False, methods=['get'], url_path='statuses')
-    def get_statuses(self, request):
-        data = [
-            {
-                "value": choice[0],
-                "label": choice[1],
-            }
-            for choice in ReservationStatus.choices
-        ]
-        return Response(data)

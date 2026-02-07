@@ -1,11 +1,15 @@
+from django.db import transaction
 from rest_framework import serializers
 
 from pension.guest.models import Guest
 from pension.guest.serializers import GuestSerializer
 from pension.reservation.models import Reservation
+from pension.room.models import Room
+from pension.room.serializers import RoomSerializer
 
 
 class ReservationReadSerializer(serializers.ModelSerializer):
+    rooms = RoomSerializer(many=True)
     class Meta:
         model = Reservation
         fields = [
@@ -19,12 +23,39 @@ class ReservationReadSerializer(serializers.ModelSerializer):
             'price',
             'currency',
             'primary_guest',
-            'room',
+            'rooms',
         ]
+
+
+class RoomReservationCreateSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False, help_text="Room ID")
+    num_adults = serializers.IntegerField(required=False)
+    num_children = serializers.IntegerField(required=False, default=0)
+
+    class Meta:
+        model = Room
+        fields = [
+            'id',
+            'num_adults',
+            'num_children',
+        ]
+
+    def validate(self, data):
+        try:
+            room = Room.objects.get(id=data['id'])
+        except Room.DoesNotExist:
+            raise serializers.ValidationError("Room does not exist")
+
+        if not room.can_fit(data['num_adults'], data['num_children']):
+            raise serializers.ValidationError("Room does not have enough capacity")
+
+        return data
+
 
 
 class ReservationCreateSerializer(serializers.ModelSerializer):
     primary_guest = GuestSerializer(help_text="Guest who created reservation")
+    rooms = RoomReservationCreateSerializer(many=True, help_text="Rooms reserved")
 
     class Meta:
         model = Reservation
@@ -36,7 +67,7 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
             'note',
             'currency',
             'primary_guest',
-            'room',
+            'rooms',
         ]
 
     def validate(self, data):
@@ -45,34 +76,47 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
                 "check_out_date must be greater than check_in_date"
             )
 
-        room = data['room']
-        from_date = data['check_in_date']
-        to_date = data['check_out_date']
-        people = data['num_adults']
-        children = data['num_children']
+        rooms = data['rooms']
 
-        if not room.is_available(from_date, to_date, people, children):
-            raise serializers.ValidationError(
-                "Room is not available for selected dates or capacity."
-            )
+        temp_reservation = Reservation(
+            check_in_date=data['check_in_date'],
+            check_out_date=data['check_out_date'],
+            num_adults=data['num_adults'],
+            num_children=data['num_children'],
+        )
+
+        temp_reservation.validate_rooms(rooms)
 
         return data
 
     def create(self, validated_data):
-        guest_data = validated_data.pop('primary_guest')
+        with transaction.atomic():
+            guest_data = validated_data.pop('primary_guest')
+            rooms = validated_data.pop('rooms')
 
-        guest, _ = Guest.objects.get_or_create(
-            email=guest_data.get('email'),
-            document_number=guest_data.get('document_number'),
-            defaults=guest_data
-        )
+            guest, _ = Guest.objects.get_or_create(
+                email=guest_data.get('email'),
+                document_number=guest_data.get('document_number'),
+                defaults=guest_data
+            )
 
-        reservation = Reservation.objects.create(
-            primary_guest=guest,
-            **validated_data
-        )
+            reservation = Reservation.objects.create(
+                primary_guest=guest,
+                **validated_data
+            )
 
-        return reservation
+            reservation.validate_rooms(rooms)
+            for room in rooms:
+                try:
+                    room = Room.objects.get(id=room['id'])
+                except Room.DoesNotExist:
+                    raise serializers.ValidationError(f"Room {room['id']} does not exist.")
+                reservation.rooms.add(room)
+
+            reservation.price = reservation.calculate_price(rooms)
+            reservation.save()
+
+            return reservation
 
 
 class ReservationUpdateSerializer(serializers.ModelSerializer):

@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 
@@ -31,10 +32,10 @@ class Reservation(models.Model):
         help_text="The primary guest who will receive the reservation",
     )
 
-    room = models.ForeignKey(
+    rooms = models.ManyToManyField(
         Room,
-        on_delete=models.PROTECT,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         related_name="reservations"
     )
 
@@ -45,3 +46,90 @@ class Reservation(models.Model):
                 name="check_reservation_dates"
             )
         ]
+
+    def validate_rooms(self, rooms):
+        """
+        rooms: [
+            {
+                "id",
+                "num_adults",
+                "num_children",
+            }
+        ]
+
+        """
+        if not rooms:
+            raise ValidationError("At least one room must be selected.")
+
+        total_people = self.num_adults + self.num_children
+
+        # 1️⃣ kapacita
+        for room_data in rooms:
+            try:
+                room = Room.objects.get(id=room_data['id'])
+            except Room.DoesNotExist:
+                raise ValidationError(f"Room {room_data['id']} does not exist.")
+            if not room.can_fit(room_data['num_adults'], room_data['num_children']):
+                raise ValidationError(f"Room {room_data['id']} does not have enough capacity.")
+            room_data['room'] = room
+
+        capacity_sum = sum(room["room"].capacity for room in rooms)
+        if capacity_sum < total_people:
+            raise ValidationError(
+                "Selected rooms do not have enough capacity."
+            )
+
+        # 2️⃣ kolize rezervací
+        for room in rooms:
+            overlapping = room["room"].reservations.filter(
+                status__in=[
+                    ReservationStatus.NEW,
+                    ReservationStatus.CONFIRMED,
+                    ReservationStatus.PAYMENT_PENDING,
+                    ReservationStatus.PAYED,
+                ],
+                check_in_date__lt=self.check_out_date,
+                check_out_date__gt=self.check_in_date,
+            ).exclude(id=self.id).exists()
+
+            if overlapping:
+                raise ValidationError(
+                    f"Room {room['id']} is not available for selected dates."
+                )
+
+
+    @property
+    def nights(self):
+        if not self.check_in_date or not self.check_out_date:
+            return 0
+        return (self.check_out_date - self.check_in_date).days
+
+
+    def calculate_price(self, rooms):
+        """
+            rooms: [
+                {
+                    "id",
+                    "num_adults",
+                    "num_children",
+                }
+            ]
+
+            """
+        price = 0
+
+        for room_data in rooms:
+            try:
+                room = Room.objects.get(id=room_data['id'])
+            except Room.DoesNotExist:
+                raise ValidationError(f"Room {room_data['id']} does not exist.")
+
+            price += room.calculate_price_per_day(room_data['num_adults'], room_data['num_children'])
+
+        if self.nights == 0:
+            return 0
+
+        price = price * self.nights
+
+        return price
+
