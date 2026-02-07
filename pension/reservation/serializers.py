@@ -100,6 +100,18 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
                 defaults=guest_data
             )
 
+            if not validated_data.get("num_adults") or validated_data.get("num_adults") == 0:
+                amount = 0
+                for room in rooms:
+                    amount += room['num_adults']
+                validated_data['num_adults'] = amount
+
+            if not validated_data.get("num_children") or validated_data.get("num_children") == 0:
+                amount = 0
+                for room in rooms:
+                    amount += room['num_children']
+                validated_data['num_children'] = amount
+
             reservation = Reservation.objects.create(
                 primary_guest=guest,
                 **validated_data
