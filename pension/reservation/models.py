@@ -37,7 +37,6 @@ class Reservation(models.Model):
         null=True, blank=True,
         related_name="reservations"
     )
-    items = models.ManyToManyField("pension.ReservationItem")
 
     class Meta:
         constraints = [

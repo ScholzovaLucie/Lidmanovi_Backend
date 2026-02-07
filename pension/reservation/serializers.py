@@ -3,7 +3,6 @@ from rest_framework import serializers
 from pension.guest.models import Guest
 from pension.guest.serializers import GuestSerializer
 from pension.reservation.models import Reservation
-from pension.reservation_item.models import ReservationItem
 
 
 class ReservationReadSerializer(serializers.ModelSerializer):
@@ -21,15 +20,10 @@ class ReservationReadSerializer(serializers.ModelSerializer):
             'currency',
             'primary_guest',
             'room',
-            'items',
         ]
 
 
 class ReservationCreateSerializer(serializers.ModelSerializer):
-    items = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=ReservationItem.objects.all()
-    )
     primary_guest = GuestSerializer(help_text="Guest who created reservation")
 
     class Meta:
@@ -43,7 +37,6 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
             'currency',
             'primary_guest',
             'room',
-            'items',
         ]
 
     def validate(self, data):
@@ -67,7 +60,6 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         guest_data = validated_data.pop('primary_guest')
-        items = validated_data.pop('items')
 
         guest, _ = Guest.objects.get_or_create(
             email=guest_data.get('email'),
@@ -79,8 +71,6 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
             primary_guest=guest,
             **validated_data
         )
-
-        reservation.items.set(items)
 
         return reservation
 
