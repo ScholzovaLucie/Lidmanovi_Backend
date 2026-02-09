@@ -14,6 +14,14 @@ class SendEmailSerializer(serializers.Serializer):
     persons = serializers.IntegerField(help_text="Number of persons")
     reason = serializers.CharField(help_text="Reason")
 
+    def validate(self, attrs):
+        to_date = attrs["date_to"]
+        from_date = attrs["date_from"]
+        if to_date <= from_date:
+            raise serializers.ValidationError("to_date must be greater than from_date")
+
+        return attrs
+
 
 class SendEmailResponseSerializer(serializers.Serializer):
     status = serializers.CharField()
