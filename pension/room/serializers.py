@@ -10,6 +10,6 @@ class RoomSerializer(serializers.ModelSerializer):
 
 
 class RoomCombinationSerializer(serializers.Serializer):
-    rooms_needed = serializers.IntegerField()
-    capacity_total = serializers.IntegerField()
+    people_total = serializers.IntegerField()
+    mode = serializers.ChoiceField(choices=["single_room", "multiple_rooms"])
     rooms = RoomSerializer(many=True)

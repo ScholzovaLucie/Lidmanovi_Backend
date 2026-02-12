@@ -2,6 +2,7 @@ from drf_spectacular.types import OpenApiTypes
 from rest_framework import viewsets, mixins, decorators
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
+from django.utils.dateparse import parse_date
 
 from pension.reservation.models import Reservation
 from pension.room.models import Room
@@ -53,15 +54,22 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
     )
     @decorators.action(detail=False, methods=['get'], url_path='available-rooms')
     def get_available_rooms(self, request):
-        from itertools import combinations
-
-        from_date = request.query_params.get('from_date')
-        to_date = request.query_params.get('to_date')
+        from_date_raw = request.query_params.get('from_date')
+        to_date_raw = request.query_params.get('to_date')
         adults = int(request.query_params.get('adults', 1))
         children = int(request.query_params.get('children', 0))
 
-        if not from_date or not to_date:
+        if not from_date_raw or not to_date_raw:
             return Response({"error": "from_date and to_date are required"}, status=400)
+
+        from_date = parse_date(from_date_raw)
+        to_date = parse_date(to_date_raw)
+
+        if not from_date or not to_date:
+            return Response(
+                {"error": "Invalid date format. Use YYYY-MM-DD"},
+                status=400
+            )
 
         if to_date <= from_date:
             return Response({"error": "to_date must be greater than from_date"}, status=400)
@@ -83,38 +91,35 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
         ]
 
         if not available_rooms:
-            return Response({"options": []})
+            return Response({
+                "people_total": total_people,
+                "options": []
+            })
 
-        available_rooms.sort(
-            key=lambda r: r.max_adults + r.max_children,
-            reverse=True
-        )
+        # 1) First try to find single rooms that can fit everyone
+        single_room_options = []
+        for room in available_rooms:
+            if (
+                room.max_adults >= adults and
+                room.max_children >= children and
+                (room.max_adults + room.max_children) >= total_people
+            ):
+                single_room_options.append(room)
 
-        MAX_ROOMS_TO_COMBINE = 6
-        available_rooms = available_rooms[:MAX_ROOMS_TO_COMBINE]
+        if single_room_options:
+            serialized = RoomSerializer(single_room_options, many=True).data
+            return Response({
+                "people_total": total_people,
+                "mode": "single_room",
+                "rooms": serialized
+            })
 
-        results = []
-
-        for r_count in range(1, len(available_rooms) + 1):
-            for combo in combinations(available_rooms, r_count):
-
-                capacity = sum(r.capacity for r in combo)
-
-                if capacity >= total_people:
-                    serialized = RoomSerializer(combo, many=True).data
-
-                    results.append({
-                        "rooms_needed": r_count,
-                        "capacity_total": capacity,
-                        "rooms": serialized
-                    })
-
-            if results:
-                break
-
+        # 2) If no single room fits everyone, return all free rooms
+        serialized_all = RoomSerializer(available_rooms, many=True).data
         return Response({
             "people_total": total_people,
-            "options": results
+            "mode": "multiple_rooms",
+            "rooms": serialized_all
         })
 
     @extend_schema(
@@ -184,4 +189,3 @@ class PrivateRoomViewSet(viewsets.GenericViewSet, mixins.UpdateModelMixin):
     permission_classes = [IsAdminUser]
 
     http_method_names = ['put']
-
