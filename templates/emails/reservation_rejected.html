@@ -1,10 +1,17 @@
-<h2>Rezervace nebyla schválena</h2>
-
 <p>Dobrý den {{ name }},</p>
 
 <p>
 Bohužel vaši rezervaci nemůžeme v požadovaném termínu potvrdit.
 </p>
+
+<p><strong>Detaily rezervace:</strong></p>
+<ul>
+  <li>Termín: {{ date_from }} – {{ date_to }}</li>
+  <li>Počet dospělích: {{ adults }}</li>
+  <li>Počet dětí: {{ children }}</li>
+  <li>Typ pokoje: {{ room_type }}</li>
+  <li>Cena: {{ price }}</li>
+</ul>
 
 {% if reason %}
 <p><strong>Důvod:</strong> {{ reason }}</p>

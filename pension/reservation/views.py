@@ -1,3 +1,4 @@
+import logging
 from random import choices
 
 from drf_spectacular.plumbing import build_basic_type
@@ -5,7 +6,8 @@ from rest_framework import viewsets, decorators, mixins
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
-from pension.reservation.models import Reservation, ReservationStatus
+from emails.services import send_templated_email
+from pension.reservation.models import Reservation, ReservationStatus, STATSU_MAP_TO_MAIL
 
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
@@ -13,8 +15,10 @@ from drf_spectacular.types import OpenApiTypes
 from pension.reservation.serializers import (
     ReservationCreateSerializer,
     ReservationUpdateSerializer,
-    ReservationReadSerializer,
+    ReservationReadSerializer, ReservationCancelSerializer,
 )
+
+LOGGER_EMAIL = logging.getLogger("emails")
 
 
 @extend_schema_view(
@@ -31,7 +35,7 @@ class PublicReservationViewSet(viewsets.GenericViewSet):
     @extend_schema(
         tags=['Reservations'],
         request=ReservationCreateSerializer,
-        responses=ReservationReadSerializer(many=True),
+        responses=ReservationReadSerializer(many=False),
     )
     @decorators.action(detail=False, methods=['post'], url_path='create')
     def create_reservation(self, request):
@@ -41,8 +45,24 @@ class PublicReservationViewSet(viewsets.GenericViewSet):
         reservation = serializer.save()
 
         read_serializer = ReservationReadSerializer(reservation)
-        return Response(read_serializer.data)
+        data = read_serializer.data
+        instance = read_serializer.instance
 
+        send_templated_email(
+            email_type="reservation_received",
+            recipient=instance.primary_guest.email,
+            context={
+                "name": f"{instance.primary_guest.first_name} {instance.primary_guest.last_name}",
+                "date_from": instance.check_in_date,
+                "date_to": instance.check_out_date,
+                "adults": instance.num_adults,
+                "children": instance.num_children,
+                "price": instance.price,
+                "room_type": ", ".join(list(instance.rooms.all().values_list('name', flat=True))),
+            },
+        )
+
+        return Response(data)
 
     @extend_schema(
         tags=['Reservations'],
@@ -141,10 +161,67 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
 
         data = serializer.validated_data
 
-        if 'status' in data and data['status'] is not None:
-            reservation.status = data['status']
-
         reservation.save()
 
         read_serializer = ReservationReadSerializer(reservation)
+
+        if 'status' in data and data['status'] is not None:
+            status = data['status']
+            reservation.status = status
+
+            template_name = STATSU_MAP_TO_MAIL.get(status)
+            if not template_name:
+                LOGGER_EMAIL.warning(f"Unknown status {status} email not sent")
+
+            else:
+                instance = read_serializer.instance
+                send_templated_email(
+                    email_type=template_name,
+                    recipient=instance.primary_guest.email,
+                    context={
+                        "name": f"{instance.primary_guest.first_name} {instance.primary_guest.last_name}",
+                        "date_from": instance.check_in_date,
+                        "date_to": instance.check_out_date,
+                        "adults": instance.num_adults,
+                        "children": instance.num_children,
+                        "price": instance.price,
+                        "room_type": ", ".join(list(instance.rooms.all().values_list('name', flat=True))),
+                    },
+                )
+                LOGGER_EMAIL.info(f"Email {template_name} sent to {instance.primary_guest.email}")
+
         return Response(read_serializer.data)
+
+    @extend_schema(
+        tags=['Reservations'],
+        request=ReservationCancelSerializer,
+        responses=ReservationReadSerializer,
+    )
+    @decorators.action(detail=True, methods=['post'], url_path='cancel')
+    def cancel_reservation(self, request, pk=None):
+        reservation = self.get_object()
+
+        serializer = ReservationCancelSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        cancel_reason = data['cancel_reason']
+
+        reservation.status = ReservationStatus.CANCELLED
+        reservation.save()
+
+        send_templated_email(
+            email_type="reservation_rejected",
+            recipient=reservation.primary_guest.email,
+            context={
+                "name": f"{reservation.primary_guest.first_name} {reservation.primary_guest.last_name}",
+                "date_from": reservation.check_in_date,
+                "date_to": reservation.check_out_date,
+                "adults": reservation.num_adults,
+                "children": reservation.num_children,
+                "price": reservation.price,
+                "room_type": ", ".join(list(reservation.rooms.all().values_list('name', flat=True))),
+                "reason": cancel_reason
+            },
+        )
+
+        return Response(ReservationReadSerializer(reservation).data)

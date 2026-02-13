@@ -10,6 +10,7 @@ from pension.room.serializers import RoomSerializer
 
 class ReservationReadSerializer(serializers.ModelSerializer):
     rooms = RoomSerializer(many=True)
+    primary_guest = GuestSerializer()
     class Meta:
         model = Reservation
         fields = [
@@ -56,6 +57,8 @@ class RoomReservationCreateSerializer(serializers.ModelSerializer):
 class ReservationCreateSerializer(serializers.ModelSerializer):
     primary_guest = GuestSerializer(help_text="Guest who created reservation")
     rooms = RoomReservationCreateSerializer(many=True, help_text="Rooms reserved")
+    num_adults = serializers.IntegerField(required=False)
+    num_children = serializers.IntegerField(required=False, default=0)
 
     class Meta:
         model = Reservation
@@ -75,17 +78,6 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "check_out_date must be greater than check_in_date"
             )
-
-        rooms = data['rooms']
-
-        temp_reservation = Reservation(
-            check_in_date=data['check_in_date'],
-            check_out_date=data['check_out_date'],
-            num_adults=data['num_adults'],
-            num_children=data['num_children'],
-        )
-
-        temp_reservation.validate_rooms(rooms)
 
         return data
 
@@ -132,7 +124,6 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
 
 
 class ReservationUpdateSerializer(serializers.ModelSerializer):
-    note = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     status = serializers.ChoiceField(
         choices=Reservation._meta.get_field('status').choices,
         required=False,
@@ -142,7 +133,17 @@ class ReservationUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reservation
         fields = [
-            'note',
             'status',
+        ]
+
+
+
+class ReservationCancelSerializer(serializers.ModelSerializer):
+    cancel_reason = serializers.CharField(required=True)
+
+    class Meta:
+        model = Reservation
+        fields = [
+            'cancel_reason',
         ]
 

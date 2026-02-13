@@ -7,6 +7,15 @@ from pension.reservation.enums import ReservationStatus
 from pension.room.models import Room
 
 
+STATSU_MAP_TO_MAIL = {
+    ReservationStatus.NEW: "reservation_received",
+    ReservationStatus.CONFIRMED: "reservation_approved",
+    ReservationStatus.CANCELLED: "reservation_rejected",
+    ReservationStatus.PAYED: "reservation_payd",
+    ReservationStatus.DONE: "reservation_done",
+}
+
+
 class Reservation(models.Model):
     check_in_date = models.DateField()
     check_out_date = models.DateField()
