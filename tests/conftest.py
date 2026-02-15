@@ -36,7 +36,6 @@ def room():
 def guest():
     return Guest.objects.create(
         email="test@test.cz",
-        document_number="123",
         first_name="John",
         last_name="Doe"
     )

@@ -88,7 +88,6 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
 
             guest, _ = Guest.objects.get_or_create(
                 email=guest_data.get('email'),
-                document_number=guest_data.get('document_number'),
                 defaults=guest_data
             )
 

@@ -18,7 +18,6 @@ def test_create_reservation(auth_client, room, guest):
             "first_name": guest.first_name,
             "last_name": guest.last_name,
             "email": guest.email,
-            "document_number": guest.document_number
         },
         "items": []
     }
@@ -49,7 +48,6 @@ def test_reservation_collision(auth_client, room, guest):
             "first_name": guest.first_name,
             "last_name": guest.last_name,
             "email": guest.email,
-            "document_number": guest.document_number
         },
         "items": []
     }
@@ -76,7 +74,6 @@ def test_invalid_dates_equal(auth_client, room, guest):
         "room": room.id,
         "primary_guest": {
             "email": "a@a.com",
-            "document_number": "X123",
             "first_name": "John",
             "last_name": "Doe"
         },
@@ -95,7 +92,6 @@ def test_invalid_dates_checkout_before_checkin(auth_client, room, guest):
         "room": room.id,
         "primary_guest": {
             "email": "b@b.com",
-            "document_number": "Y456",
             "first_name": "Jane",
             "last_name": "Doe"
         },
@@ -116,7 +112,6 @@ def test_guest_reuse_by_email_and_document(auth_client, room):
         "room": room.id,
         "primary_guest": {
             "email": guest_email,
-            "document_number": guest_doc,
             "first_name": "John",
             "last_name": "Doe"
         },
@@ -134,7 +129,6 @@ def test_guest_reuse_by_email_and_document(auth_client, room):
         "room": room.id,
         "primary_guest": {
             "email": guest_email,
-            "document_number": guest_doc,
             "first_name": "John",
             "last_name": "Doe"
         },
@@ -157,7 +151,6 @@ def test_existing_guest_not_duplicated_with_full_data(auth_client, room, guest):
             "first_name": guest.first_name,
             "last_name": guest.last_name,
             "email": guest.email,
-            "document_number": guest.document_number
         },
         "items": []
     }
@@ -172,7 +165,6 @@ def test_existing_guest_not_duplicated_with_full_data(auth_client, room, guest):
             "first_name": guest.first_name,
             "last_name": guest.last_name,
             "email": guest.email,
-            "document_number": guest.document_number
         },
         "items": []
     }
@@ -200,7 +192,6 @@ def test_duplicit_reservation_in_sa_day(auth_client, room, guest):
             "first_name": guest.first_name,
             "last_name": guest.last_name,
             "email": guest.email,
-            "document_number": guest.document_number
         },
         "items": []
     }
@@ -223,7 +214,6 @@ def test_room_capacity_too_many_adults(auth_client, room):
         "room": room.id,
         "primary_guest": {
             "email": "overadults@example.com",
-            "document_number": "CAPAD",
             "first_name": "Test",
             "last_name": "User"
         },
@@ -242,7 +232,6 @@ def test_room_capacity_too_many_children(auth_client, room):
         "room": room.id,
         "primary_guest": {
             "email": "overchildren@example.com",
-            "document_number": "CAPCH",
             "first_name": "Test",
             "last_name": "User"
         },
@@ -261,7 +250,6 @@ def test_room_capacity_too_many_total(auth_client, room):
         "room": room.id,
         "primary_guest": {
             "email": "overtotal@example.com",
-            "document_number": "CAPTOT",
             "first_name": "Test",
             "last_name": "User"
         },
@@ -291,7 +279,6 @@ def test_overlap_touching_boundaries_allowed(auth_client, room, guest):
         "room": room.id,
         "primary_guest": {
             "email": "touching@example.com",
-            "document_number": "TOUCH",
             "first_name": "Test",
             "last_name": "User"
         },
@@ -320,7 +307,6 @@ def test_overlap_same_day_not_allowed(auth_client, room, guest):
         "room": room.id,
         "primary_guest": {
             "email": "overlap@example.com",
-            "document_number": "OVER",
             "first_name": "Test",
             "last_name": "User"
         },
@@ -349,7 +335,6 @@ def test_cancelled_and_done_reservations_do_not_block(auth_client, room, guest, 
         "room": room.id,
         "primary_guest": {
             "email": "notblocked@example.com",
-            "document_number": "NOTBLK",
             "first_name": "Test",
             "last_name": "User"
         },
