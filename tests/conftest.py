@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from pension.room.models import Room
 from pension.guest.models import Guest
+from unittest.mock import Mock
 
 @pytest.fixture
 def staff_user(db):
@@ -47,3 +48,10 @@ def staff_client(staff_user):
     client.force_authenticate(user=staff_user)
     return client
 
+
+@pytest.fixture(autouse=True)
+def mock_emails(monkeypatch):
+    mocked_sender = Mock()
+    monkeypatch.setattr("pension.reservation.views.send_templated_email", mocked_sender)
+    monkeypatch.setattr("emails.views.send_templated_email", mocked_sender)
+    return mocked_sender

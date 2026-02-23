@@ -48,14 +48,6 @@ class Reservation(models.Model):
         related_name="reservations"
     )
 
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                check=models.Q(check_in_date__lt=models.F("check_out_date")),
-                name="check_reservation_dates"
-            )
-        ]
-
     def validate_rooms(self, rooms):
         """
         rooms: [
@@ -141,4 +133,3 @@ class Reservation(models.Model):
         price = price * self.nights
 
         return price
-

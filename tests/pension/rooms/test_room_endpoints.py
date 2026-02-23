@@ -3,6 +3,8 @@ from pension.room.models import Room
 from pension.reservation.models import Reservation, Guest
 from pension.reservation.enums import ReservationStatus
 
+pytestmark = pytest.mark.usefixtures("mock_emails")
+
 @pytest.mark.django_db
 def test_room_availability_available_when_no_reservations(auth_client, room):
     # Room should be available if there are no reservations

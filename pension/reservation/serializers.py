@@ -28,6 +28,13 @@ class ReservationReadSerializer(serializers.ModelSerializer):
         ]
 
 
+class ReservationGuestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Guest
+        fields = '__all__'
+        validators = []
+
+
 class RoomReservationCreateSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, help_text="Room ID")
     num_adults = serializers.IntegerField(required=False)
@@ -55,7 +62,7 @@ class RoomReservationCreateSerializer(serializers.ModelSerializer):
 
 
 class ReservationCreateSerializer(serializers.ModelSerializer):
-    primary_guest = GuestSerializer(help_text="Guest who created reservation")
+    primary_guest = ReservationGuestSerializer(help_text="Guest who created reservation")
     rooms = RoomReservationCreateSerializer(many=True, help_text="Rooms reserved")
     num_adults = serializers.IntegerField(required=False)
     num_children = serializers.IntegerField(required=False, default=0)
@@ -86,10 +93,13 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
             guest_data = validated_data.pop('primary_guest')
             rooms = validated_data.pop('rooms')
 
-            guest, _ = Guest.objects.get_or_create(
+            guest = Guest.objects.filter(
+                first_name=guest_data.get('first_name'),
+                last_name=guest_data.get('last_name'),
                 email=guest_data.get('email'),
-                defaults=guest_data
-            )
+            ).first()
+            if guest is None:
+                guest = Guest.objects.create(**guest_data)
 
             if not validated_data.get("num_adults") or validated_data.get("num_adults") == 0:
                 amount = 0
@@ -145,4 +155,3 @@ class ReservationCancelSerializer(serializers.ModelSerializer):
         fields = [
             'cancel_reason',
         ]
-

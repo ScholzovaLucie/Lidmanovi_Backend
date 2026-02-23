@@ -5,6 +5,8 @@ from pension.reservation.models import Reservation, Guest
 from pension.room.models import Room
 from pension.reservation.enums import ReservationStatus
 
+pytestmark = pytest.mark.usefixtures("mock_emails")
+
 
 @pytest.mark.django_db
 def test_create_reservation(auth_client, room, guest):

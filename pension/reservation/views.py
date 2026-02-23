@@ -2,7 +2,7 @@ import logging
 from random import choices
 
 from drf_spectacular.plumbing import build_basic_type
-from rest_framework import viewsets, decorators, mixins
+from rest_framework import viewsets, decorators, mixins, serializers
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
@@ -81,7 +81,36 @@ class PublicReservationViewSet(viewsets.GenericViewSet):
 
 
 @extend_schema_view(
-    list=extend_schema(tags=['Reservations']),
+    list=extend_schema(
+        tags=['Reservations'],
+        parameters=[
+            OpenApiParameter(
+                name='reservation_from',
+                type=OpenApiTypes.DATE,
+                required=False,
+                description='Reservation period start (YYYY-MM-DD). Works with reservation_to as overlap filter.',
+            ),
+            OpenApiParameter(
+                name='reservation_to',
+                type=OpenApiTypes.DATE,
+                required=False,
+                description='Reservation period end (YYYY-MM-DD). Works with reservation_from as overlap filter.',
+            ),
+            OpenApiParameter(
+                name='status',
+                required=False,
+                description='Reservation status',
+                type=OpenApiTypes.STR,
+                enum=[choice[0] for choice in ReservationStatus.choices],
+            ),
+            OpenApiParameter(
+                name='room_id',
+                required=False,
+                description='Room ID',
+                type=OpenApiTypes.INT,
+            ),
+        ],
+    ),
     retrieve=extend_schema(tags=['Reservations']),
 )
 class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -94,6 +123,39 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
         if self.action in ('update', 'partial_update'):
             return ReservationUpdateSerializer
         return ReservationReadSerializer
+
+    def _parse_date_param(self, name):
+        value = self.request.query_params.get(name)
+        if not value:
+            return None
+
+        field = serializers.DateField()
+        try:
+            return field.to_internal_value(value)
+        except serializers.ValidationError:
+            raise serializers.ValidationError({name: "Invalid date format. Use YYYY-MM-DD."})
+
+    def get_queryset(self):
+        queryset = Reservation.objects.all()
+
+        reservation_from = self._parse_date_param('reservation_from')
+        reservation_to = self._parse_date_param('reservation_to')
+        status = self.request.query_params.get('status')
+        room_id = self.request.query_params.get('room_id')
+
+        if reservation_from:
+            queryset = queryset.filter(check_out_date__gte=reservation_from)
+
+        if reservation_to:
+            queryset = queryset.filter(check_in_date__lte=reservation_to)
+
+        if status:
+            queryset = queryset.filter(status=status)
+
+        if room_id:
+            queryset = queryset.filter(rooms__id=room_id)
+
+        return queryset.distinct()
 
     @extend_schema(
         tags=['Reservations'],
