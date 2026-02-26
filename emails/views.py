@@ -36,6 +36,7 @@ class SendEmailView(GenericAPIView):
                     "reason": data.get("reason"),
                     "message": data.get("message"),
                 },
+                raise_on_error=True,
             )
 
             return Response({"status": "sent"}, status=status.HTTP_200_OK)

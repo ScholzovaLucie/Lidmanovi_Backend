@@ -1,6 +1,10 @@
+import secrets
+import string
+
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 
 from pension.guest.models import Guest
 from pension.reservation.enums import ReservationStatus
@@ -19,6 +23,8 @@ STATSU_MAP_TO_MAIL = {
 class Reservation(models.Model):
     check_in_date = models.DateField()
     check_out_date = models.DateField()
+
+    number = models.CharField(max_length=20, unique=True)
 
     status = models.CharField(
         max_length=20,
@@ -47,6 +53,22 @@ class Reservation(models.Model):
         blank=True,
         related_name="reservations"
     )
+
+    @staticmethod
+    def _generate_number():
+        # Format: R-YYYYMMDD-XXXXXX
+        date_part = timezone.now().strftime("%Y%m%d")
+        alphabet = string.digits
+        while True:
+            suffix = ''.join(secrets.choice(alphabet) for _ in range(6))
+            number = f"R-{date_part}-{suffix}"
+            if not Reservation.objects.filter(number=number).exists():
+                return number
+
+    def save(self, *args, **kwargs):
+        if not self.number:
+            self.number = self._generate_number()
+        super().save(*args, **kwargs)
 
     def validate_rooms(self, rooms):
         """

@@ -5,10 +5,12 @@ from pension.reservation.enums import ReservationStatus
 
 class Room(models.Model):
     name = models.CharField(max_length=50, unique=True, null=False)
+    name_i18n = models.JSONField(default=dict, blank=True)
     max_adults = models.PositiveIntegerField(default=1, null=False)
     max_children = models.PositiveIntegerField(default=0, null=False)
     capacity = models.PositiveIntegerField(default=1, null=False)
     description = models.TextField(blank=True)
+    description_i18n = models.JSONField(default=dict, blank=True)
     price_for_adult = models.PositiveIntegerField(default=0, null=False)
     price_for_children = models.PositiveIntegerField(default=0, null=False)
     is_active = models.BooleanField(default=True)

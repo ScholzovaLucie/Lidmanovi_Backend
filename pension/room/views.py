@@ -8,16 +8,50 @@ from pension.reservation.models import Reservation
 from pension.room.models import Room
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 
-from pension.room.serializers import RoomSerializer, RoomCombinationSerializer
+from pension.room.serializers import RoomSerializer, RoomCombinationSerializer, PublicRoomSerializer
 
 
 @extend_schema_view(
-    list=extend_schema(tags=['Rooms']),
-    retrieve=extend_schema(tags=['Rooms']),
+    list=extend_schema(
+        tags=['Rooms'],
+        parameters=[
+            OpenApiParameter(
+                name='lang',
+                type=OpenApiTypes.STR,
+                required=False,
+                description='Requested language (for example: cs, en, de).',
+            ),
+            OpenApiParameter(
+                name='Accept-Language',
+                location=OpenApiParameter.HEADER,
+                type=OpenApiTypes.STR,
+                required=False,
+                description='Language preference header, used when lang query param is missing.',
+            ),
+        ],
+    ),
+    retrieve=extend_schema(
+        tags=['Rooms'],
+        parameters=[
+            OpenApiParameter(
+                name='lang',
+                type=OpenApiTypes.STR,
+                required=False,
+                description='Requested language (for example: cs, en, de).',
+            ),
+            OpenApiParameter(
+                name='Accept-Language',
+                location=OpenApiParameter.HEADER,
+                type=OpenApiTypes.STR,
+                required=False,
+                description='Language preference header, used when lang query param is missing.',
+            ),
+        ],
+    ),
 )
 class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet, mixins.CreateModelMixin):
     queryset = Room.objects.all()
-    serializer_class = RoomSerializer
+    serializer_class = PublicRoomSerializer
     permission_classes = []
     http_method_names = ['get']
 
@@ -48,6 +82,19 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
                 type=OpenApiTypes.INT,
                 required=True,
                 description='Count of children',
+            ),
+            OpenApiParameter(
+                name='lang',
+                type=OpenApiTypes.STR,
+                required=False,
+                description='Requested language (for example: cs, en, de).',
+            ),
+            OpenApiParameter(
+                name='Accept-Language',
+                location=OpenApiParameter.HEADER,
+                type=OpenApiTypes.STR,
+                required=False,
+                description='Language preference header, used when lang query param is missing.',
             ),
         ],
         responses=RoomCombinationSerializer(many=True),
@@ -107,7 +154,11 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
                 single_room_options.append(room)
 
         if single_room_options:
-            serialized = RoomSerializer(single_room_options, many=True).data
+            serialized = PublicRoomSerializer(
+                single_room_options,
+                many=True,
+                context=self.get_serializer_context(),
+            ).data
             return Response({
                 "people_total": total_people,
                 "mode": "single_room",
@@ -115,7 +166,11 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
             })
 
         # 2) If no single room fits everyone, return all free rooms
-        serialized_all = RoomSerializer(available_rooms, many=True).data
+        serialized_all = PublicRoomSerializer(
+            available_rooms,
+            many=True,
+            context=self.get_serializer_context(),
+        ).data
         return Response({
             "people_total": total_people,
             "mode": "multiple_rooms",
@@ -148,6 +203,19 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
                 type=OpenApiTypes.INT,
                 required=True,
                 description='Count of children',
+            ),
+            OpenApiParameter(
+                name='lang',
+                type=OpenApiTypes.STR,
+                required=False,
+                description='Requested language (for example: cs, en, de).',
+            ),
+            OpenApiParameter(
+                name='Accept-Language',
+                location=OpenApiParameter.HEADER,
+                type=OpenApiTypes.STR,
+                required=False,
+                description='Language preference header, used when lang query param is missing.',
             ),
         ],
         responses=RoomSerializer(many=True),

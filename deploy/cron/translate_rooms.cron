@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin
+
+# Every hour at minute 0.
+0 * * * * /Users/luciescholzova/PycharmProjects/LidmanoviProject/scripts/cron_translate_rooms.sh >> /Users/luciescholzova/PycharmProjects/LidmanoviProject/logs/cron_translate_rooms.log 2>&1

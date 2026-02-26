@@ -15,6 +15,7 @@ class ReservationReadSerializer(serializers.ModelSerializer):
         model = Reservation
         fields = [
             'id',
+            'number',
             'check_in_date',
             'check_out_date',
             'status',

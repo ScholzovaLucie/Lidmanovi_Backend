@@ -26,7 +26,7 @@ SUBJECTS = {
     EmailType.GENERIC: "Zpráva z Restaurace u Lidmanů",
 }
 
-def send_templated_email(email_type, recipient, context):
+def send_templated_email(email_type, recipient, context, raise_on_error=False):
     try:
         template = TEMPLATES.get(email_type)
 
@@ -43,13 +43,22 @@ def send_templated_email(email_type, recipient, context):
             [recipient],
         )
         email.attach_alternative(html_content, "text/html")
-        email.send()
+        sent_count = email.send(fail_silently=not raise_on_error)
 
-        LOGGER.info(
-            "Email sent | type=%s | recipient=%s",
+        if sent_count:
+            LOGGER.info(
+                "Email sent | type=%s | recipient=%s",
+                email_type,
+                recipient
+            )
+            return True
+
+        LOGGER.warning(
+            "Email not sent | type=%s | recipient=%s",
             email_type,
             recipient
         )
+        return False
     except Exception as e:
         LOGGER.error(
             "Email failed | type=%s | recipient=%s | error=%s",
@@ -57,4 +66,6 @@ def send_templated_email(email_type, recipient, context):
             recipient,
             str(e)
         )
-        raise
+        if raise_on_error:
+            raise
+        return False

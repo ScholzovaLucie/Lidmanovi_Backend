@@ -79,6 +79,9 @@ def test_serializer_reuses_same_guest_for_multiple_reservations():
 
     assert Guest.objects.filter(email="reuse-logic@example.com").count() == 1
     assert reservation_1.primary_guest_id == reservation_2.primary_guest_id
+    assert reservation_1.number
+    assert reservation_2.number
+    assert reservation_1.number != reservation_2.number
 
 
 @pytest.mark.django_db

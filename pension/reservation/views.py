@@ -109,6 +109,24 @@ class PublicReservationViewSet(viewsets.GenericViewSet):
                 description='Room ID',
                 type=OpenApiTypes.INT,
             ),
+            OpenApiParameter(
+                name='primary_guest_email',
+                required=False,
+                description='Primary guest email',
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name='primary_guest_last_name',
+                required=False,
+                description='Primary guest last name',
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name='primary_guest_id',
+                required=False,
+                description='Primary guest ID',
+                type=OpenApiTypes.INT,
+            ),
         ],
     ),
     retrieve=extend_schema(tags=['Reservations']),
@@ -142,6 +160,9 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
         reservation_to = self._parse_date_param('reservation_to')
         status = self.request.query_params.get('status')
         room_id = self.request.query_params.get('room_id')
+        primary_guest_email = self.request.query_params.get('primary_guest_email')
+        primary_guest_last_name = self.request.query_params.get('primary_guest_last_name')
+        primary_guest_id = self.request.query_params.get('primary_guest_id')
 
         if reservation_from:
             queryset = queryset.filter(check_out_date__gte=reservation_from)
@@ -154,6 +175,15 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
 
         if room_id:
             queryset = queryset.filter(rooms__id=room_id)
+
+        if primary_guest_email:
+            queryset = queryset.filter(primary_guest__email__iexact=primary_guest_email)
+
+        if primary_guest_last_name:
+            queryset = queryset.filter(primary_guest__last_name__icontains=primary_guest_last_name)
+
+        if primary_guest_id:
+            queryset = queryset.filter(primary_guest_id=primary_guest_id)
 
         return queryset.distinct()
 
@@ -223,34 +253,32 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
 
         data = serializer.validated_data
 
-        reservation.save()
-
-        read_serializer = ReservationReadSerializer(reservation)
-
         if 'status' in data and data['status'] is not None:
             status = data['status']
             reservation.status = status
+            reservation.save(update_fields=["status"])
 
             template_name = STATSU_MAP_TO_MAIL.get(status)
             if not template_name:
                 LOGGER_EMAIL.warning(f"Unknown status {status} email not sent")
 
             else:
-                instance = read_serializer.instance
                 send_templated_email(
                     email_type=template_name,
-                    recipient=instance.primary_guest.email,
+                    recipient=reservation.primary_guest.email,
                     context={
-                        "name": f"{instance.primary_guest.first_name} {instance.primary_guest.last_name}",
-                        "date_from": instance.check_in_date,
-                        "date_to": instance.check_out_date,
-                        "adults": instance.num_adults,
-                        "children": instance.num_children,
-                        "price": instance.price,
-                        "room_type": ", ".join(list(instance.rooms.all().values_list('name', flat=True))),
+                        "name": f"{reservation.primary_guest.first_name} {reservation.primary_guest.last_name}",
+                        "date_from": reservation.check_in_date,
+                        "date_to": reservation.check_out_date,
+                        "adults": reservation.num_adults,
+                        "children": reservation.num_children,
+                        "price": reservation.price,
+                        "room_type": ", ".join(list(reservation.rooms.all().values_list('name', flat=True))),
                     },
                 )
-                LOGGER_EMAIL.info(f"Email {template_name} sent to {instance.primary_guest.email}")
+                LOGGER_EMAIL.info(f"Email {template_name} sent to {reservation.primary_guest.email}")
+
+        read_serializer = ReservationReadSerializer(reservation)
 
         return Response(read_serializer.data)
 
