@@ -2,6 +2,10 @@ import pytest
 from rest_framework.test import APIClient
 
 from editorial_system.page.models import Page
+from editorial_system.page.services import (
+    TRANSLATION_AUTO_GENERATED,
+    TRANSLATION_MANUALLY_REVIEWED,
+)
 
 
 @pytest.mark.django_db
@@ -94,3 +98,89 @@ def test_pages_create_requires_authentication():
     )
 
     assert response.status_code == 401
+
+
+@pytest.mark.django_db
+def test_pages_upsert_triggers_i18n_generation(auth_client):
+    response = auth_client.put(
+        "/editorial_system/pages/upsert/",
+        {"path": "/kontakt", "lang": "cs", "content_json": {"title": "Kontakt"}},
+        format="json",
+    )
+    assert response.status_code == 201
+
+    page = Page.objects.get(path="/kontakt", lang="cs")
+    assert "en" in page.content_i18n
+    assert "de" in page.content_i18n
+    assert "pl" in page.content_i18n
+    assert page.translation_state_i18n["en"]["state"] == TRANSLATION_AUTO_GENERATED
+
+
+@pytest.mark.django_db
+def test_pages_can_return_translated_content_for_requested_lang_without_separate_row():
+    Page.objects.create(
+        path="/kontakt",
+        lang="cs",
+        content_json={"title": "Kontakt"},
+        content_i18n={"en": {"title": "Contact"}},
+        translation_state_i18n={"en": {"state": TRANSLATION_AUTO_GENERATED}},
+    )
+    client = APIClient()
+
+    response = client.get("/editorial_system/pages/?path=/kontakt&lang=en")
+
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0]["content_json"]["title"] == "Contact"
+    assert response.data[0]["requested_lang"] == "en"
+    assert response.data[0]["translation_status"] == TRANSLATION_AUTO_GENERATED
+
+
+@pytest.mark.django_db
+def test_pages_manual_translation_override_is_preserved_on_source_update(auth_client):
+    create_response = auth_client.put(
+        "/editorial_system/pages/upsert/",
+        {"path": "/kontakt", "lang": "cs", "content_json": {"title": "Kontakt"}},
+        format="json",
+    )
+    page_id = create_response.data["id"]
+
+    manual_response = auth_client.patch(
+        f"/editorial_system/pages/{page_id}/translations/",
+        {"lang": "en", "content_json": {"title": "Manually reviewed"}},
+        format="json",
+    )
+    assert manual_response.status_code == 200
+
+    update_response = auth_client.patch(
+        "/editorial_system/pages/upsert/",
+        {"path": "/kontakt", "lang": "cs", "content_json": {"title": "Kontakt novy"}},
+        format="json",
+    )
+    assert update_response.status_code == 200
+
+    page = Page.objects.get(id=page_id)
+    assert page.content_i18n["en"]["title"] == "Manually reviewed"
+    assert page.translation_state_i18n["en"]["state"] == TRANSLATION_MANUALLY_REVIEWED
+
+
+@pytest.mark.django_db
+def test_pages_translate_all_backfills_existing_pages(auth_client):
+    Page.objects.create(
+        path="/cenik",
+        lang="cs",
+        content_json={"title": "Cenik"},
+        content_i18n={"cs": {"title": "Cenik"}},
+    )
+
+    response = auth_client.post(
+        "/editorial_system/pages/translate-all/",
+        {"target_langs": ["en"]},
+        format="json",
+    )
+    assert response.status_code == 200
+    assert response.data["processed_pages"] >= 1
+
+    page = Page.objects.get(path="/cenik", lang="cs")
+    assert page.content_i18n["en"]["title"] == "Cenik"
+    assert page.translation_state_i18n["en"]["state"] == TRANSLATION_AUTO_GENERATED

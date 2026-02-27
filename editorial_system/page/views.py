@@ -7,6 +7,10 @@ from rest_framework.response import Response
 
 from editorial_system.page.models import Page
 from editorial_system.page.serializers import PageSerializer
+from editorial_system.page.services import (
+    TRANSLATION_MANUALLY_REVIEWED,
+    run_page_translation_job,
+)
 
 
 @extend_schema_view(
@@ -23,7 +27,13 @@ from editorial_system.page.serializers import PageSerializer
                 name="lang",
                 type=OpenApiTypes.STR,
                 required=False,
-                description="Language filter (for example: cs, en, de).",
+                description="Requested response language (for example: cs, en, de).",
+            ),
+            OpenApiParameter(
+                name="source_lang",
+                type=OpenApiTypes.STR,
+                required=False,
+                description="Filter by source language record.",
             ),
         ],
     ),
@@ -42,15 +52,39 @@ class PageViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         return [IsAuthenticated()]
 
+    def perform_create(self, serializer):
+        page = serializer.save()
+        run_page_translation_job(page=page)
+
+    def perform_update(self, serializer):
+        page = serializer.save()
+        run_page_translation_job(page=page)
+
     def get_queryset(self):
         queryset = super().get_queryset()
-        path = self.request.query_params.get("path")
-        lang = self.request.query_params.get("lang")
+        path = self.request.query_params.get("path", "").strip()
+        lang = self.request.query_params.get("lang", "").strip().lower()
+        source_lang = self.request.query_params.get("source_lang", "").strip().lower()
 
-        if path is not None:
-            queryset = queryset.filter(path=path.strip())
-        if lang is not None:
-            queryset = queryset.filter(lang=lang.strip().lower())
+        if path:
+            queryset = queryset.filter(path=path)
+        if source_lang:
+            queryset = queryset.filter(lang=source_lang)
+            return queryset
+
+        if lang and path:
+            exact_match = queryset.filter(lang=lang)
+            if exact_match.exists():
+                return exact_match
+
+            source_fallback = queryset.filter(lang="cs")
+            if source_fallback.exists():
+                return source_fallback
+
+            return queryset.order_by("id")[:1]
+
+        if lang and not path:
+            queryset = queryset.filter(lang=lang)
 
         return queryset
 
@@ -102,10 +136,113 @@ class PageViewSet(viewsets.ModelViewSet):
         if page:
             serializer = self.get_serializer(page, data=payload, partial=partial)
             serializer.is_valid(raise_exception=True)
-            serializer.save()
+            page = serializer.save()
+            run_page_translation_job(page=page)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         serializer = self.get_serializer(data=payload, partial=partial)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        page = serializer.save()
+        run_page_translation_job(page=page)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(
+        tags=["Pages"],
+        description="Manually override translation for one language.",
+    )
+    @action(detail=True, methods=["patch"], url_path="translations")
+    def translations(self, request, pk=None):
+        page = self.get_object()
+        target_lang = (request.data.get("lang") or "").strip().lower()
+        content_json = request.data.get("content_json")
+
+        if not target_lang:
+            return Response(
+                {"lang": ["This field is required."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if content_json is None:
+            return Response(
+                {"content_json": ["This field is required."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        content_i18n = dict(page.content_i18n or {})
+        translation_state_i18n = dict(page.translation_state_i18n or {})
+
+        content_i18n[target_lang] = content_json
+        translation_state_i18n[target_lang] = {
+            "state": TRANSLATION_MANUALLY_REVIEWED,
+        }
+
+        page.content_i18n = content_i18n
+        page.translation_state_i18n = translation_state_i18n
+        page.save(update_fields=["content_i18n", "translation_state_i18n"])
+
+        serializer = self.get_serializer(page)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        tags=["Pages"],
+        description="Run translation job for this page.",
+    )
+    @action(detail=True, methods=["post"], url_path="translate")
+    def translate(self, request, pk=None):
+        page = self.get_object()
+        overwrite = bool(request.data.get("overwrite", False))
+        target_langs = request.data.get("target_langs")
+        if target_langs is not None and not isinstance(target_langs, list):
+            return Response(
+                {"target_langs": ["This field must be a list of language codes."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        run_page_translation_job(
+            page=page,
+            overwrite=overwrite,
+            target_langs=target_langs,
+        )
+        page.refresh_from_db()
+        serializer = self.get_serializer(page)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        tags=["Pages"],
+        description="Run translation job for all matching pages.",
+    )
+    @action(detail=False, methods=["post"], url_path="translate-all")
+    def translate_all(self, request):
+        overwrite = bool(request.data.get("overwrite", False))
+        target_langs = request.data.get("target_langs")
+        path = (request.data.get("path") or request.query_params.get("path") or "").strip()
+        source_lang = (
+            request.data.get("source_lang")
+            or request.query_params.get("source_lang")
+            or ""
+        ).strip().lower()
+
+        if target_langs is not None and not isinstance(target_langs, list):
+            return Response(
+                {"target_langs": ["This field must be a list of language codes."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        queryset = Page.objects.all()
+        if path:
+            queryset = queryset.filter(path=path)
+        if source_lang:
+            queryset = queryset.filter(lang=source_lang)
+
+        processed = 0
+        for page in queryset.iterator():
+            run_page_translation_job(
+                page=page,
+                overwrite=overwrite,
+                target_langs=target_langs,
+            )
+            processed += 1
+
+        return Response(
+            {"processed_pages": processed},
+            status=status.HTTP_200_OK,
+        )
