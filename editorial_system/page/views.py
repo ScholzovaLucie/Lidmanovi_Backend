@@ -7,10 +7,7 @@ from rest_framework.response import Response
 
 from editorial_system.page.models import Page
 from editorial_system.page.serializers import PageSerializer
-from editorial_system.page.services import (
-    TRANSLATION_MANUALLY_REVIEWED,
-    run_page_translation_job,
-)
+from editorial_system.page.services import TRANSLATION_MANUALLY_REVIEWED
 
 
 @extend_schema_view(
@@ -51,14 +48,6 @@ class PageViewSet(viewsets.ModelViewSet):
         if self.action in ["list", "retrieve"]:
             return [AllowAny()]
         return [IsAuthenticated()]
-
-    def perform_create(self, serializer):
-        page = serializer.save()
-        run_page_translation_job(page=page)
-
-    def perform_update(self, serializer):
-        page = serializer.save()
-        run_page_translation_job(page=page)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -136,14 +125,12 @@ class PageViewSet(viewsets.ModelViewSet):
         if page:
             serializer = self.get_serializer(page, data=payload, partial=partial)
             serializer.is_valid(raise_exception=True)
-            page = serializer.save()
-            run_page_translation_job(page=page)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         serializer = self.get_serializer(data=payload, partial=partial)
         serializer.is_valid(raise_exception=True)
-        page = serializer.save()
-        run_page_translation_job(page=page)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @extend_schema(
@@ -181,68 +168,3 @@ class PageViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(page)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @extend_schema(
-        tags=["Pages"],
-        description="Run translation job for this page.",
-    )
-    @action(detail=True, methods=["post"], url_path="translate")
-    def translate(self, request, pk=None):
-        page = self.get_object()
-        overwrite = bool(request.data.get("overwrite", False))
-        target_langs = request.data.get("target_langs")
-        if target_langs is not None and not isinstance(target_langs, list):
-            return Response(
-                {"target_langs": ["This field must be a list of language codes."]},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        run_page_translation_job(
-            page=page,
-            overwrite=overwrite,
-            target_langs=target_langs,
-        )
-        page.refresh_from_db()
-        serializer = self.get_serializer(page)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @extend_schema(
-        tags=["Pages"],
-        description="Run translation job for all matching pages.",
-    )
-    @action(detail=False, methods=["post"], url_path="translate-all")
-    def translate_all(self, request):
-        overwrite = bool(request.data.get("overwrite", False))
-        target_langs = request.data.get("target_langs")
-        path = (request.data.get("path") or request.query_params.get("path") or "").strip()
-        source_lang = (
-            request.data.get("source_lang")
-            or request.query_params.get("source_lang")
-            or ""
-        ).strip().lower()
-
-        if target_langs is not None and not isinstance(target_langs, list):
-            return Response(
-                {"target_langs": ["This field must be a list of language codes."]},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        queryset = Page.objects.all()
-        if path:
-            queryset = queryset.filter(path=path)
-        if source_lang:
-            queryset = queryset.filter(lang=source_lang)
-
-        processed = 0
-        for page in queryset.iterator():
-            run_page_translation_job(
-                page=page,
-                overwrite=overwrite,
-                target_langs=target_langs,
-            )
-            processed += 1
-
-        return Response(
-            {"processed_pages": processed},
-            status=status.HTTP_200_OK,
-        )
