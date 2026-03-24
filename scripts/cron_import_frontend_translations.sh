@@ -4,7 +4,7 @@ set -euo pipefail
 PROJECT_DIR="/Users/luciescholzova/PycharmProjects/LidmanoviProject"
 cd "$PROJECT_DIR"
 
-LOCALES_DIR="${LOCALES_DIR:-/tmp/locales}"
+LOCALES_DIR="${LOCALES_DIR:-/app/tmp/locales}"
 SOURCE_LANG="${SOURCE_LANG:-cs}"
 OVERWRITE="${OVERWRITE:-0}"
 IF_EMPTY="${IF_EMPTY:-0}"
