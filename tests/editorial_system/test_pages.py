@@ -21,10 +21,11 @@ def test_pages_list_can_filter_by_path_and_lang(auth_client):
     response = auth_client.get("/editorial_system/pages/?path=/kontakt&lang=cs")
 
     assert response.status_code == 200
-    assert len(response.data) == 1
-    assert response.data[0]["id"] == target_page.id
-    assert response.data[0]["path"] == "/kontakt"
-    assert response.data[0]["lang"] == "cs"
+    assert response.data["count"] == 1
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["id"] == target_page.id
+    assert response.data["results"][0]["path"] == "/kontakt"
+    assert response.data["results"][0]["lang"] == "cs"
 
 
 @pytest.mark.django_db
@@ -84,7 +85,8 @@ def test_pages_list_is_public_for_unauthenticated_user():
     response = client.get("/editorial_system/pages/?path=/kontakt&lang=cs")
 
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert response.data["count"] == 1
+    assert len(response.data["results"]) == 1
 
 
 @pytest.mark.django_db
@@ -130,10 +132,11 @@ def test_pages_can_return_translated_content_for_requested_lang_without_separate
     response = client.get("/editorial_system/pages/?path=/kontakt&lang=en")
 
     assert response.status_code == 200
-    assert len(response.data) == 1
-    assert response.data[0]["content_json"]["title"] == "Contact"
-    assert response.data[0]["requested_lang"] == "en"
-    assert response.data[0]["translation_status"] == TRANSLATION_AUTO_GENERATED
+    assert response.data["count"] == 1
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["content_json"]["title"] == "Contact"
+    assert response.data["results"][0]["requested_lang"] == "en"
+    assert response.data["results"][0]["translation_status"] == TRANSLATION_AUTO_GENERATED
 
 
 @pytest.mark.django_db

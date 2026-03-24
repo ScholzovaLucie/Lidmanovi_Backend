@@ -1,6 +1,7 @@
 import logging
 from random import choices
 
+from django.db.models import Q
 from drf_spectacular.plumbing import build_basic_type
 from rest_framework import viewsets, decorators, mixins, serializers
 from rest_framework.permissions import IsAdminUser
@@ -127,6 +128,12 @@ class PublicReservationViewSet(viewsets.GenericViewSet):
                 description='Primary guest ID',
                 type=OpenApiTypes.INT,
             ),
+            OpenApiParameter(
+                name='search_text',
+                required=False,
+                description='Generic text search across reservation, guest, and room string fields.',
+                type=OpenApiTypes.STR,
+            ),
         ],
     ),
     retrieve=extend_schema(tags=['Reservations']),
@@ -163,6 +170,7 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
         primary_guest_email = self.request.query_params.get('primary_guest_email')
         primary_guest_last_name = self.request.query_params.get('primary_guest_last_name')
         primary_guest_id = self.request.query_params.get('primary_guest_id')
+        search_text = (self.request.query_params.get('search_text') or '').strip()
 
         if reservation_from:
             queryset = queryset.filter(check_out_date__gte=reservation_from)
@@ -184,6 +192,22 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
 
         if primary_guest_id:
             queryset = queryset.filter(primary_guest_id=primary_guest_id)
+
+        if search_text:
+            queryset = queryset.filter(
+                Q(number__icontains=search_text)
+                | Q(status__icontains=search_text)
+                | Q(note__icontains=search_text)
+                | Q(currency__icontains=search_text)
+                | Q(primary_guest__first_name__icontains=search_text)
+                | Q(primary_guest__last_name__icontains=search_text)
+                | Q(primary_guest__email__icontains=search_text)
+                | Q(primary_guest__phone__icontains=search_text)
+                | Q(primary_guest__country__icontains=search_text)
+                | Q(primary_guest__note__icontains=search_text)
+                | Q(rooms__name__icontains=search_text)
+                | Q(rooms__description__icontains=search_text)
+            )
 
         return queryset.distinct()
 
@@ -213,6 +237,11 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
             check_in_date__lte=to_date,
             check_out_date__gte=from_date,
         )
+        page = self.paginate_queryset(reservations)
+        if page is not None:
+            serializer = ReservationReadSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
         serializer = ReservationReadSerializer(reservations, many=True)
         return Response(serializer.data)
 
@@ -235,6 +264,11 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
         status = request.query_params.get('status')
 
         reservations = Reservation.objects.filter(status=status)
+
+        page = self.paginate_queryset(reservations)
+        if page is not None:
+            serializer = ReservationReadSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
         serializer = ReservationReadSerializer(reservations, many=True)
         return Response(serializer.data)

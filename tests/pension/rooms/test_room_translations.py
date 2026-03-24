@@ -22,10 +22,11 @@ def test_public_room_list_returns_translation_from_lang_query():
     response = client.get("/pension/public/rooms/?lang=en")
 
     assert response.status_code == 200
-    assert response.data[0]["name"] == "Comfort Room"
-    assert response.data[0]["description"] == "English description"
-    assert "name_i18n" not in response.data[0]
-    assert "description_i18n" not in response.data[0]
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["name"] == "Comfort Room"
+    assert response.data["results"][0]["description"] == "English description"
+    assert "name_i18n" not in response.data["results"][0]
+    assert "description_i18n" not in response.data["results"][0]
 
 
 @pytest.mark.django_db
@@ -46,5 +47,6 @@ def test_public_room_list_uses_accept_language_when_lang_query_missing():
     response = client.get("/pension/public/rooms/", HTTP_ACCEPT_LANGUAGE="de-DE,de;q=0.9,en;q=0.8")
 
     assert response.status_code == 200
-    assert response.data[0]["name"] == "Familienzimmer"
-    assert response.data[0]["description"] == "Grundbeschreibung"
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["name"] == "Familienzimmer"
+    assert response.data["results"][0]["description"] == "Grundbeschreibung"
