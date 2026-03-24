@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin
+
+# Every day at 01:15.
+15 1 * * * /Users/luciescholzova/PycharmProjects/LidmanoviProject/scripts/cron_import_frontend_translations.sh >> /Users/luciescholzova/PycharmProjects/LidmanoviProject/logs/cron_import_frontend_translations.log 2>&1
