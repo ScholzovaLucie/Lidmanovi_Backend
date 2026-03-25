@@ -3,6 +3,9 @@ set -e
 
 cd /app
 
+# Create logs directory if it doesn't exist
+mkdir -p logs
+
 python manage.py migrate
 
 if [ "${INIT_IMPORT_FRONTEND_TRANSLATIONS:-0}" = "1" ]; then
