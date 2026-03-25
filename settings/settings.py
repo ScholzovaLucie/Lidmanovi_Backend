@@ -24,7 +24,11 @@ SECRET_KEY = 'django-insecure-y#72!b$xc+66s0s$hxa(%sc8#1m)+2eoyh9g1$onov^676-ji=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'lidmanovi-be.bajerlukas.cz'
+]
 
 # Application definition
 
@@ -56,6 +60,8 @@ MIDDLEWARE = [
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://lidmanovi-fe.bajerlukas.cz",
+    "http://lidmanovi-fe.bajerlukas.cz"
 ]
 
 ROOT_URLCONF = 'settings.urls'

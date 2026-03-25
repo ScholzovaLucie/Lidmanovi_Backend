@@ -23,11 +23,14 @@ from drf_spectacular.views import (
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from emails.views import SendEmailView
+from health import health_check
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('swagger/', SpectacularSwaggerView.as_view(url_name='schema')),
+
+    path('health/', health_check, name='health'),
 
     path('api-auth/', include('rest_framework.urls')),
     path('pension/', include('pension.urls')),
