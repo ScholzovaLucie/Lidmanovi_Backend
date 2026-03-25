@@ -38,4 +38,12 @@ if [ "${INIT_IMPORT_FRONTEND_TRANSLATIONS:-0}" = "1" ]; then
   fi
 fi
 
+if [ "${INIT_SYNC_PHOTOS_FROM_MEDIA:-0}" = "1" ]; then
+  if [ "${INIT_SYNC_PHOTOS_ONLY_IF_EMPTY:-0}" = "1" ]; then
+    python manage.py sync_photos_from_media --photos-dir "${MEDIA_PHOTOS_DIR:-/app/media/editorial/photos}" --if-empty
+  else
+    python manage.py sync_photos_from_media --photos-dir "${MEDIA_PHOTOS_DIR:-/app/media/editorial/photos}"
+  fi
+fi
+
 exec "$@"

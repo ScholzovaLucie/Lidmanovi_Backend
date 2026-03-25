@@ -49,7 +49,6 @@ class Reservation(models.Model):
 
     rooms = models.ManyToManyField(
         Room,
-        null=True,
         blank=True,
         related_name="reservations"
     )
