@@ -8,7 +8,12 @@ from pension.reservation.models import Reservation
 from pension.room.models import Room
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 
-from pension.room.serializers import RoomSerializer, RoomCombinationSerializer, PublicRoomSerializer
+from pension.room.serializers import (
+    RoomAvailabilitySerializer,
+    RoomCombinationSerializer,
+    RoomSerializer,
+    PublicRoomSerializer,
+)
 
 
 @extend_schema_view(
@@ -97,7 +102,7 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
                 description='Language preference header, used when lang query param is missing.',
             ),
         ],
-        responses=RoomCombinationSerializer(many=True),
+        responses=RoomCombinationSerializer,
     )
     @decorators.action(detail=False, methods=['get'], url_path='available-rooms')
     def get_available_rooms(self, request):
@@ -130,7 +135,7 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
 
         reserved_ids = reservations.values_list('rooms__id', flat=True)
 
-        rooms = self.get_queryset().exclude(id__in=reserved_ids)
+        rooms = self.get_queryset().exclude(id__in=reserved_ids).exclude(is_active=False)
 
         available_rooms = [
             r for r in rooms
@@ -218,7 +223,7 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
                 description='Language preference header, used when lang query param is missing.',
             ),
         ],
-        responses=RoomSerializer(many=True),
+        responses=RoomAvailabilitySerializer,
     )
     @decorators.action(detail=True, methods=['get'], url_path='availability')
     def check_availability(self, request, pk=None):
@@ -239,6 +244,9 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
         if to_date <= from_date:
             return Response({"error": "to_date must be greater than from_date"},status=400)
 
+        if room.is_active is False:
+            return Response({"error": "Room is not active"}, status=400)
+
 
         available = room.is_available(from_date, to_date, adults, children)
 
@@ -249,11 +257,14 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
 
 
 @extend_schema_view(
-    update=extend_schema(tags=['Rooms']),
+    update=extend_schema(tags=['Rooms'], request=RoomSerializer, responses=RoomSerializer),
+    partial_update=extend_schema(tags=['Rooms'], request=RoomSerializer, responses=RoomSerializer),
+    destroy=extend_schema(tags=['Rooms']),
+    create=extend_schema(tags=['Rooms'], request=RoomSerializer, responses=RoomSerializer),
 )
-class PrivateRoomViewSet(viewsets.GenericViewSet, mixins.UpdateModelMixin):
+class PrivateRoomViewSet(viewsets.GenericViewSet, mixins.UpdateModelMixin, mixins.DestroyModelMixin, mixins.CreateModelMixin):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
     permission_classes = [IsAdminUser]
 
-    http_method_names = ['put']
+    http_method_names = ['put', 'patch', 'delete', 'post']

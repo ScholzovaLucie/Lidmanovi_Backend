@@ -1,11 +1,27 @@
 from rest_framework import serializers
 
 from common.i18n import extract_requested_language
+from common.schema import JSONObjectField
 from editorial_system.page.models import Page
 from editorial_system.page.services import get_translated_content
 
 
 class PageSerializer(serializers.ModelSerializer):
+    content_json = JSONObjectField(help_text="Structured page content for the source language.")
+    content_i18n = JSONObjectField(help_text="Translated page content keyed by language code.", required=False)
+    translation_state_i18n = JSONObjectField(
+        help_text="Translation metadata keyed by language code.",
+        required=False,
+    )
+    translation_status = serializers.CharField(
+        read_only=True,
+        help_text="Computed status for the requested language.",
+    )
+    requested_lang = serializers.CharField(
+        read_only=True,
+        help_text="Language actually used to build the response.",
+    )
+
     def validate_lang(self, value):
         return value.strip().lower()
 
@@ -19,9 +35,20 @@ class PageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Page
-        fields = "__all__"
+        fields = [
+            "id",
+            "path",
+            "lang",
+            "content_json",
+            "content_i18n",
+            "translation_state_i18n",
+            "translation_status",
+            "requested_lang",
+        ]
+        read_only_fields = ["id", "translation_status", "requested_lang"]
         extra_kwargs = {
-            "id": {"read_only": True},
+            "path": {"help_text": "Page route path, for example /kontakt."},
+            "lang": {"help_text": "Source language of this page record."},
         }
 
     def to_representation(self, instance):

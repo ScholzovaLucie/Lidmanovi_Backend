@@ -43,9 +43,9 @@ from editorial_system.info_box.serializers import InfoBoxSerializer
             ),
         ],
     ),
-    create=extend_schema(tags=['Info Boxes']),
-    update=extend_schema(tags=['Info Boxes']),
-    partial_update=extend_schema(tags=['Info Boxes']),
+    create=extend_schema(tags=['Info Boxes'], request=InfoBoxSerializer, responses=InfoBoxSerializer),
+    update=extend_schema(tags=['Info Boxes'], request=InfoBoxSerializer, responses=InfoBoxSerializer),
+    partial_update=extend_schema(tags=['Info Boxes'], request=InfoBoxSerializer, responses=InfoBoxSerializer),
     destroy=extend_schema(tags=['Info Boxes']),
 )
 class InfoBoxViewSet(viewsets.ModelViewSet):

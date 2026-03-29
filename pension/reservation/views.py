@@ -16,7 +16,7 @@ from drf_spectacular.types import OpenApiTypes
 from pension.reservation.serializers import (
     ReservationCreateSerializer,
     ReservationUpdateSerializer,
-    ReservationReadSerializer, ReservationCancelSerializer,
+    ReservationReadSerializer, ReservationCancelSerializer, ReservationStatusSerializer,
 )
 
 LOGGER_EMAIL = logging.getLogger("emails")
@@ -67,7 +67,7 @@ class PublicReservationViewSet(viewsets.GenericViewSet):
 
     @extend_schema(
         tags=['Reservations'],
-        responses=OpenApiTypes.OBJECT,
+        responses=ReservationStatusSerializer(many=True),
     )
     @decorators.action(detail=False, methods=['get'], url_path='statuses')
     def get_statuses(self, request):

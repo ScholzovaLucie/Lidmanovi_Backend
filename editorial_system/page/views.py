@@ -3,11 +3,17 @@ from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiPara
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework import serializers
 from rest_framework.response import Response
 
 from editorial_system.page.models import Page
 from editorial_system.page.serializers import PageSerializer
 from editorial_system.page.services import TRANSLATION_MANUALLY_REVIEWED
+
+
+class PageTranslationUpdateSerializer(serializers.Serializer):
+    lang = serializers.CharField(help_text="Language code to override, for example en.")
+    content_json = serializers.JSONField(help_text="Translated page content payload.")
 
 
 @extend_schema_view(
@@ -35,9 +41,9 @@ from editorial_system.page.services import TRANSLATION_MANUALLY_REVIEWED
         ],
     ),
     retrieve=extend_schema(tags=["Pages"]),
-    create=extend_schema(tags=["Pages"]),
-    update=extend_schema(tags=["Pages"]),
-    partial_update=extend_schema(tags=["Pages"]),
+    create=extend_schema(tags=["Pages"], request=PageSerializer, responses=PageSerializer),
+    update=extend_schema(tags=["Pages"], request=PageSerializer, responses=PageSerializer),
+    partial_update=extend_schema(tags=["Pages"], request=PageSerializer, responses=PageSerializer),
     destroy=extend_schema(tags=["Pages"]),
 )
 class PageViewSet(viewsets.ModelViewSet):
@@ -79,6 +85,11 @@ class PageViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         tags=["Pages"],
+        request=PageSerializer,
+        responses={
+            200: PageSerializer,
+            201: PageSerializer,
+        },
         parameters=[
             OpenApiParameter(
                 name="path",
@@ -135,6 +146,8 @@ class PageViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         tags=["Pages"],
+        request=PageTranslationUpdateSerializer,
+        responses=PageSerializer,
         description="Manually override translation for one language.",
     )
     @action(detail=True, methods=["patch"], url_path="translations")
