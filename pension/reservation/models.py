@@ -21,6 +21,7 @@ STATSU_MAP_TO_MAIL = {
 
 
 class Reservation(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
     check_in_date = models.DateField()
     check_out_date = models.DateField()
 

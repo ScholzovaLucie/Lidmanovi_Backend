@@ -1,4 +1,6 @@
 import pytest
+from datetime import timedelta
+from django.utils import timezone
 
 from pension.guest.models import Guest
 from pension.reservation.enums import ReservationStatus
@@ -310,5 +312,42 @@ def test_admin_by_status_returns_paginated_results(auth_client):
     assert response.status_code == 200
     assert response.data["count"] >= 2
     assert len(response.data["results"]) == 1
-    assert response.data["results"][0]["id"] in {first.id, second.id}
+    assert response.data["results"][0]["id"] == second.id
     assert response.data["next"] is not None
+
+
+@pytest.mark.django_db
+def test_admin_list_returns_reservations_from_newest_to_oldest(auth_client):
+    room = Room.objects.create(
+        name="Room H",
+        capacity=2,
+        max_adults=2,
+        max_children=0,
+        price_for_adult=1000,
+        price_for_children=0,
+    )
+    guest = Guest.objects.create(first_name="Eva", last_name="Order", email="order@example.com")
+
+    older = _create_reservation(
+        guest=guest,
+        room=room,
+        check_in="2026-01-10",
+        check_out="2026-01-12",
+        status=ReservationStatus.NEW,
+    )
+    newer = _create_reservation(
+        guest=guest,
+        room=room,
+        check_in="2026-03-10",
+        check_out="2026-03-12",
+        status=ReservationStatus.NEW,
+    )
+
+    Reservation.objects.filter(id=older.id).update(created_at=timezone.now() - timedelta(days=1))
+    Reservation.objects.filter(id=newer.id).update(created_at=timezone.now())
+
+    response = auth_client.get("/pension/admin/reservations/")
+
+    assert response.status_code == 200
+    result_ids = [item["id"] for item in response.data["results"]]
+    assert result_ids.index(newer.id) < result_ids.index(older.id)

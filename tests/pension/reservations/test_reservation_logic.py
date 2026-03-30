@@ -165,3 +165,138 @@ def test_calculate_price_uses_room_rates_and_nights():
 
     # (2 * 1000 + 1 * 500) * 3 nights
     assert price == 7500
+
+
+@pytest.mark.django_db
+def test_serializer_rejects_duplicate_room_ids():
+    room = Room.objects.create(
+        name="Pokoj logic-6",
+        capacity=3,
+        max_adults=2,
+        max_children=1,
+        price_for_adult=1000,
+        price_for_children=500,
+    )
+
+    payload = {
+        "check_in_date": "2026-08-01",
+        "check_out_date": "2026-08-03",
+        "currency": "CZK",
+        "primary_guest": {
+            "first_name": "Jan",
+            "last_name": "Novak",
+            "email": "duplicate-room@example.com",
+        },
+        "rooms": [
+            {"id": room.id, "num_adults": 1, "num_children": 0},
+            {"id": room.id, "num_adults": 1, "num_children": 0},
+        ],
+    }
+
+    serializer = ReservationCreateSerializer(data=payload)
+
+    assert serializer.is_valid() is False
+    assert "Each room can only be selected once." in str(serializer.errors)
+
+
+@pytest.mark.django_db
+def test_serializer_rejects_mismatched_total_people_vs_rooms_breakdown():
+    room = Room.objects.create(
+        name="Pokoj logic-7",
+        capacity=3,
+        max_adults=2,
+        max_children=1,
+        price_for_adult=1000,
+        price_for_children=500,
+    )
+
+    payload = _build_payload(
+        "2026-08-10",
+        "2026-08-12",
+        "mismatch@example.com",
+        room.id,
+        num_adults=1,
+        num_children=0,
+    )
+
+    serializer = ReservationCreateSerializer(data=payload)
+
+    assert serializer.is_valid() is False
+    assert "Total adults must match" in str(serializer.errors)
+
+
+@pytest.mark.django_db
+def test_serializer_rejects_inactive_room():
+    room = Room.objects.create(
+        name="Pokoj logic-8",
+        capacity=3,
+        max_adults=2,
+        max_children=1,
+        price_for_adult=1000,
+        price_for_children=500,
+        is_active=False,
+    )
+
+    serializer = ReservationCreateSerializer(
+        data=_build_payload("2026-09-01", "2026-09-03", "inactive@example.com", room.id)
+    )
+
+    assert serializer.is_valid() is False
+    assert "Room is not active" in str(serializer.errors)
+
+
+@pytest.mark.django_db
+def test_serializer_rejects_empty_rooms():
+    payload = {
+        "check_in_date": "2026-09-10",
+        "check_out_date": "2026-09-12",
+        "currency": "CZK",
+        "primary_guest": {
+            "first_name": "Jan",
+            "last_name": "Novak",
+            "email": "empty-rooms@example.com",
+        },
+        "rooms": [],
+    }
+
+    serializer = ReservationCreateSerializer(data=payload)
+
+    assert serializer.is_valid() is False
+    assert "At least one room must be selected." in str(serializer.errors)
+
+
+@pytest.mark.django_db
+def test_calculate_price_uses_multiple_rooms_and_nights():
+    first_room = Room.objects.create(
+        name="Pokoj logic-9a",
+        capacity=3,
+        max_adults=2,
+        max_children=1,
+        price_for_adult=1000,
+        price_for_children=500,
+    )
+    second_room = Room.objects.create(
+        name="Pokoj logic-9b",
+        capacity=2,
+        max_adults=1,
+        max_children=1,
+        price_for_adult=800,
+        price_for_children=200,
+    )
+    guest = Guest.objects.create(first_name="Cena", last_name="Multi", email="price-multi@example.com")
+    reservation = Reservation.objects.create(
+        check_in_date=date(2026, 10, 1),
+        check_out_date=date(2026, 10, 4),
+        num_adults=3,
+        num_children=2,
+        primary_guest=guest,
+    )
+
+    price = reservation.calculate_price(
+        [
+            {"id": first_room.id, "num_adults": 2, "num_children": 1},
+            {"id": second_room.id, "num_adults": 1, "num_children": 1},
+        ]
+    )
+
+    assert price == 10500

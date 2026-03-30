@@ -25,11 +25,13 @@ def auth_client(staff_user):
 def room():
     return Room.objects.create(
         id=1,
+        name="Test room",
         capacity=4,
         max_children=2,
         max_adults=2,
-        price=1000,
         description="Test room",
+        price_for_adult=1000,
+        price_for_children=500,
     )
 
 

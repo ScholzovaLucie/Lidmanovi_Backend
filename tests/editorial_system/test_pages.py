@@ -170,7 +170,7 @@ def test_pages_translate_all_endpoint_is_not_available(auth_client):
         format="json",
     )
 
-    assert response.status_code == 404
+    assert response.status_code == 405
 
 
 @pytest.mark.django_db

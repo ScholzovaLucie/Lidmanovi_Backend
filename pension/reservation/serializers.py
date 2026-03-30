@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from pension.guest.models import Guest
@@ -68,6 +69,9 @@ class RoomReservationCreateSerializer(serializers.Serializer):
         except Room.DoesNotExist:
             raise serializers.ValidationError("Room does not exist")
 
+        if not room.is_active:
+            raise serializers.ValidationError("Room is not active")
+
         if not room.can_fit(data['num_adults'], data['num_children']):
             raise serializers.ValidationError("Room does not have enough capacity")
 
@@ -76,6 +80,12 @@ class RoomReservationCreateSerializer(serializers.Serializer):
 
 
 class ReservationCreateSerializer(serializers.ModelSerializer):
+    message = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        write_only=True,
+        help_text="Frontend alias for reservation note.",
+    )
     primary_guest = ReservationGuestSerializer(help_text="Guest who created reservation")
     rooms = RoomReservationCreateSerializer(many=True, help_text="Rooms reserved")
     num_adults = serializers.IntegerField(
@@ -98,6 +108,7 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
             'num_adults',
             'num_children',
             'note',
+            'message',
             'currency',
             'primary_guest',
             'rooms',
@@ -110,9 +121,38 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
+        if not data.get("note") and data.get("message") is not None:
+            data["note"] = data["message"]
+
         if data['check_out_date'] <= data['check_in_date']:
             raise serializers.ValidationError(
                 "check_out_date must be greater than check_in_date"
+            )
+
+        rooms = data.get("rooms") or []
+        if not rooms:
+            raise serializers.ValidationError({"rooms": ["At least one room must be selected."]})
+
+        room_ids = [room["id"] for room in rooms]
+        if len(room_ids) != len(set(room_ids)):
+            raise serializers.ValidationError({"rooms": ["Each room can only be selected once."]})
+
+        initial_data = getattr(self, "initial_data", {}) or {}
+        has_explicit_num_adults = "num_adults" in initial_data
+        has_explicit_num_children = "num_children" in initial_data
+        explicit_num_adults = data.get("num_adults")
+        explicit_num_children = data.get("num_children")
+        rooms_num_adults = sum(room["num_adults"] for room in rooms)
+        rooms_num_children = sum(room["num_children"] for room in rooms)
+
+        if has_explicit_num_adults and explicit_num_adults != rooms_num_adults:
+            raise serializers.ValidationError(
+                {"num_adults": ["Total adults must match the sum of adults assigned to rooms."]}
+            )
+
+        if has_explicit_num_children and explicit_num_children != rooms_num_children:
+            raise serializers.ValidationError(
+                {"num_children": ["Total children must match the sum of children assigned to rooms."]}
             )
 
         return data
@@ -121,6 +161,7 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             guest_data = validated_data.pop('primary_guest')
             rooms = validated_data.pop('rooms')
+            validated_data.pop('message', None)
 
             guest = Guest.objects.filter(
                 first_name=guest_data.get('first_name'),
@@ -147,7 +188,10 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
                 **validated_data
             )
 
-            reservation.validate_rooms(rooms)
+            try:
+                reservation.validate_rooms(rooms)
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError(exc.messages)
             for room in rooms:
                 try:
                     room = Room.objects.get(id=room['id'])

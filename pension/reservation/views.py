@@ -142,6 +142,10 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
     queryset = Reservation.objects.all()
     permission_classes = [IsAdminUser]
 
+    @staticmethod
+    def _apply_default_ordering(queryset):
+        return queryset.order_by('-created_at', '-id')
+
     def get_serializer_class(self):
         if self.action == 'create':
             return ReservationCreateSerializer
@@ -209,7 +213,7 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
                 | Q(rooms__description__icontains=search_text)
             )
 
-        return queryset.distinct()
+        return self._apply_default_ordering(queryset.distinct())
 
     @extend_schema(
         tags=['Reservations'],
@@ -233,10 +237,10 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
     def get_operation_by_date(self, request):
         from_date = request.query_params.get('from_date')
         to_date = request.query_params.get('to_date')
-        reservations = Reservation.objects.filter(
+        reservations = self._apply_default_ordering(Reservation.objects.filter(
             check_in_date__lte=to_date,
             check_out_date__gte=from_date,
-        )
+        ))
         page = self.paginate_queryset(reservations)
         if page is not None:
             serializer = ReservationReadSerializer(page, many=True)
@@ -263,7 +267,7 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
     def get_operation_by_status(self, request):
         status = request.query_params.get('status')
 
-        reservations = Reservation.objects.filter(status=status)
+        reservations = self._apply_default_ordering(Reservation.objects.filter(status=status))
 
         page = self.paginate_queryset(reservations)
         if page is not None:
