@@ -14,6 +14,8 @@ export const translations_rezervace = {
       totalPerNight: "Celkem za noc",
       priceCzk: "{{amount}} Kč",
       pricePerNight: "{{amount}} Kč / noc",
+      back: "Zpět",
+      continue: "Pokračovat",
     },
     stepper: {
       term: "Termín",
@@ -46,7 +48,7 @@ export const translations_rezervace = {
       noRoomText:
         "Pro zadaný termín a počet hostů momentálně není dostupný žádný pokoj. Změňte prosím termín rezervace a zkuste to znovu.",
       backToTerm: "Zpět na výběr termínu",
-      cta: "Pokračovat na konfiguraci pokojů",
+      cta: "Pokračovat na konfiguraci",
       notAssignedError:
         "{{count}} hosté nejsou přiřazeni. Prosím vyberte další pokoj.",
     },
@@ -57,6 +59,7 @@ export const translations_rezervace = {
       remainingChildren: "{{count}} dítě",
       assignHint: "Rozdělte lůžka mezi hosty",
       cta: "Pokračovat na údaje",
+      emptyRoomsError: "Nelze pokračovat s prázdnými pokoji",
     },
     info: {
       title: "Informace a potvrzení",
@@ -94,9 +97,16 @@ export const translations_rezervace = {
       childrenCount: "{{count}} děti",
       adultRow: "{{count}}x Dospělý",
       childRow: "{{count}}x Dítě",
+      guestInfo: "Informace o hostu",
+      guestName: "Jméno",
+      guestEmail: "E-mail",
+      guestPhone: "Telefon",
+      guestCountry: "Země",
+      guestNote: "Poznámka",
       totalPrice: "Celková cena:",
       submit: "ZÁVAZNĚ REZERVOVAT",
       success: "Rezervace proběhla úspěšně!",
+      successEmailConfirmation: "Rezervace úspěšně vytvořena, potvrzení zasláno do emailu.",
       reservationNumber: "Číslo rezervace:",
     },
     price: {
@@ -111,10 +121,18 @@ export const translations_rezervace = {
       remove: "Odebrat",
       showMore: "Zobrazit více",
       showLess: "Zobrazit méně",
+      beds: "Postele",
     },
     roomCardCompact: {
       adultPrice: "{{amount}} Kč / dospělý",
       childPrice: "{{amount}} Kč / dítě",
+      removeDialog: {
+        title: "Odebrat pokoj?",
+        message:
+          "Pokud pokoj odeberete, budete navráceni na krok výběru pokojů.",
+        confirm: "Ano, odebrat",
+        cancel: "Zrušit",
+      },
     },
     validation: {
       checkInPast: "Datum příjezdu nemůže být v minulosti.",
@@ -125,7 +143,8 @@ export const translations_rezervace = {
       adultsRequired: "Musí být vybrán alespoň 1 dospělý.",
       childrenNegative: "Počet dětí nemůže být záporný.",
       childrenWithoutAdult: "Děti nemohou být bez doprovodu dospělého.",
-      formHasErrors: "Formulář obsahuje chyby. Opravte je prosím před odesláním.",
+      formHasErrors:
+        "Formulář obsahuje chyby. Opravte je prosím před odesláním.",
       submitFailed:
         "Nepodařilo se odeslat rezervaci, zkuste to prosím znovu později, nebo nás kontaktujte emailem nebo telefonicky.",
     },
@@ -184,6 +203,7 @@ export const translations_rezervace = {
       totalPerNight: "Total per night",
       priceCzk: "CZK {{amount}}",
       pricePerNight: "CZK {{amount}} / night",
+      back: "Back",
     },
     stepper: {
       term: "Dates",
@@ -264,9 +284,16 @@ export const translations_rezervace = {
       childrenCount: "{{count}} children",
       adultRow: "{{count}}x Adult",
       childRow: "{{count}}x Child",
+      guestInfo: "Guest information",
+      guestName: "Name",
+      guestEmail: "Email",
+      guestPhone: "Phone",
+      guestCountry: "Country",
+      guestNote: "Note",
       totalPrice: "Total price:",
       submit: "CONFIRM RESERVATION",
       success: "Reservation completed successfully!",
+      successEmailConfirmation: "Reservation successfully created, confirmation sent to email.",
       reservationNumber: "Reservation number:",
     },
     price: {
@@ -281,10 +308,18 @@ export const translations_rezervace = {
       remove: "Remove",
       showMore: "Show more",
       showLess: "Show less",
+      beds: "Beds",
     },
     roomCardCompact: {
       adultPrice: "CZK {{amount}} / adult",
       childPrice: "CZK {{amount}} / child",
+      removeDialog: {
+        title: "Remove room?",
+        message:
+          "If you remove the room, you will be returned to the room selection step.",
+        confirm: "Yes, remove",
+        cancel: "Cancel",
+      },
     },
     validation: {
       checkInPast: "Check-in date cannot be in the past.",
@@ -295,7 +330,8 @@ export const translations_rezervace = {
       adultsRequired: "At least one adult is required.",
       childrenNegative: "Number of children cannot be negative.",
       childrenWithoutAdult: "Children cannot stay without an adult.",
-      formHasErrors: "The form contains errors. Please fix them before submitting.",
+      formHasErrors:
+        "The form contains errors. Please fix them before submitting.",
       submitFailed:
         "Failed to submit reservation. Please try again later, or contact us by email or phone.",
     },
@@ -354,6 +390,7 @@ export const translations_rezervace = {
       totalPerNight: "Gesamt pro Nacht",
       priceCzk: "{{amount}} CZK",
       pricePerNight: "{{amount}} CZK / Nacht",
+      back: "Zurück",
     },
     stepper: {
       term: "Termin",
@@ -437,6 +474,7 @@ export const translations_rezervace = {
       totalPrice: "Gesamtpreis:",
       submit: "VERBINDLICH RESERVIEREN",
       success: "Reservierung erfolgreich abgeschlossen!",
+      successEmailConfirmation: "Reservierung erfolgreich erstellt, Bestätigung per E-Mail gesendet.",
       reservationNumber: "Reservierungsnummer:",
     },
     price: {
@@ -455,6 +493,13 @@ export const translations_rezervace = {
     roomCardCompact: {
       adultPrice: "{{amount}} CZK / Erwachsener",
       childPrice: "{{amount}} CZK / Kind",
+      removeDialog: {
+        title: "Zimmer entfernen?",
+        message:
+          "Wenn Sie das Zimmer entfernen, kehren Sie zum Schritt der Zimmerauswahl zurück.",
+        confirm: "Ja, entfernen",
+        cancel: "Abbrechen",
+      },
     },
     validation: {
       checkInPast: "Das Anreisedatum darf nicht in der Vergangenheit liegen.",
@@ -525,6 +570,7 @@ export const translations_rezervace = {
       totalPerNight: "Razem za noc",
       priceCzk: "{{amount}} CZK",
       pricePerNight: "{{amount}} CZK / noc",
+      back: "Wróć",
     },
     stepper: {
       term: "Termin",
@@ -608,6 +654,7 @@ export const translations_rezervace = {
       totalPrice: "Cena całkowita:",
       submit: "REZERWUJĘ",
       success: "Rezerwacja zakończona sukcesem!",
+      successEmailConfirmation: "Rezerwacja została pomyślnie utworzona, potwierdzenie wysłane na e-mail.",
       reservationNumber: "Numer rezerwacji:",
     },
     price: {
@@ -626,6 +673,13 @@ export const translations_rezervace = {
     roomCardCompact: {
       adultPrice: "{{amount}} CZK / dorosły",
       childPrice: "{{amount}} CZK / dziecko",
+      removeDialog: {
+        title: "Usunąć pokój?",
+        message:
+          "Jeśli usuniesz pokój, zostaniesz przeniesiony do kroku wyboru pokoju.",
+        confirm: "Tak, usuń",
+        cancel: "Anuluj",
+      },
     },
     validation: {
       checkInPast: "Data przyjazdu nie może być z przeszłości.",
@@ -636,8 +690,7 @@ export const translations_rezervace = {
       adultsRequired: "Wymagana jest co najmniej 1 osoba dorosła.",
       childrenNegative: "Liczba dzieci nie może być ujemna.",
       childrenWithoutAdult: "Dzieci nie mogą być bez opieki osoby dorosłej.",
-      formHasErrors:
-        "Formularz zawiera błędy. Popraw je przed wysłaniem.",
+      formHasErrors: "Formularz zawiera błędy. Popraw je przed wysłaniem.",
       submitFailed:
         "Nie udało się wysłać rezerwacji. Spróbuj ponownie później lub skontaktuj się z nami e-mailem albo telefonicznie.",
     },

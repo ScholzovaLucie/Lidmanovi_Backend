@@ -1,5 +1,12 @@
 export const en = {
+  pageTitle: "Pension U Lidmanů",
   upozorneni: "",
+  tiles: [
+    { alt: "Accommodation", text: "Cozy rooms with private bathroom and breakfast included." },
+    { alt: "Restaurant", text: "Czech cuisine served in a fireplace dining room and summer garden." },
+    { alt: "Weddings", text: "Garden ceremonies and festive banquets for your special day." },
+    { alt: "Nature", text: "Gateway to the Table Mountains, Broumov Walls and Adršpach rocks." },
+  ],
   uvod: "Accommodation in the Table Mountains, Broumovsko region, Machovská Lhota. A sunny place in an attractive, undiscovered tourist area between the Broumov Walls and the Polish Table Mountains near Adršpach. Quiet rural atmosphere. Stylish environment in an old guesthouse from 1884.",
   lokace:
     "Our pension is located in the protected landscape area of Broumov in the romantic village of Machovská Lhota, which is surrounded on one side by the National Park Table Mountains with the famous Velká Hejšovina and on the other side by the Broumov Walls, the popular Adršpach is 22 km away from us. Machov region is a paradise for hiking, cycling, cross-country skiing and bouldering. Lovers of a quiet rural atmosphere and family environment will find their place here.",
@@ -20,7 +27,14 @@ export const en = {
   },
 };
 export const cs = {
+  pageTitle: "Penzion U Lidmanů",
   upozorneni: "",
+  tiles: [
+    { alt: "Ubytování", text: "Útulné pokoje s vlastním sociálním zařízením a snídaní v ceně." },
+    { alt: "Restaurace", text: "Česká kuchyně v lokálu s krbem a na letní zahrádce." },
+    { alt: "Svatby", text: "Zahradní obřady a slavnostní hostiny pro váš velký den." },
+    { alt: "Příroda", text: "Brána do Stolových hor, Broumovských stěn a Adršpašských skal." },
+  ],
   uvod: "Ubytování ve Stolových horách, Broumovsko, Machovská Lhota. Slunné místo v atraktivní zatím neobjevené turistické oblasti mezi Broumovskými stěnami a polskými Stolovými horami nedaleko Adršpachu. Klidná venkovská atmosféra. Stylové prostředí v budově starého hostince z roku 1884.",
   lokace:
     "Náš pension se nachází v Chráněné krajinné oblasti Broumovsko v romantické vísce Machovská Lhota, která je z jedné strany obklopena Národní parkem Stolové hory s věhlasnou Hejšovinou a z druhé strany Broumovskými stěnami, populární Adršpach je od nás vzdálen 22km. Machovsko je rájem pěší turistiky, cykloturistiky, běžeckého lyžování a boulderingu. Na své si zde přijdou milovníci klidné venkovské atmosféry a rodinného prostředí.",
@@ -38,7 +52,14 @@ export const cs = {
 };
 
 export const pl = {
+  pageTitle: "Pensjonat U Lidmanů",
   upozorneni: "",
+  tiles: [
+    { alt: "Noclegi", text: "Przytulne pokoje z prywatną łazienką i śniadaniem w cenie." },
+    { alt: "Restauracja", text: "Kuchnia czeska w sali z kominkiem i letnim ogródku." },
+    { alt: "Wesela", text: "Ceremonie ogrodowe i uroczyste przyjęcia na Wasz wyjątkowy dzień." },
+    { alt: "Przyroda", text: "Brama do Gór Stołowych, Broumovskich Ścian i skał Adrszpachu." },
+  ],
   uvod: "Zakwaterowanie w Górach Stołowych, region Broumovsko , Machovská Lhota . Słoneczne miejsce w atrakcyjnym, nieodkrytym turystycznie rejonie pomiędzy Broumovskimi Ścianami a Polskimi Górami Stołowymi w okolicach Adrszpachu . Spokojna wiejska atmosfera. Stylowe otoczenie w starym pensjonacie z 1884 roku.",
   lokace:
     "Nasz pensjonat znajduje się w obszarze chronionego krajobrazu Broumov w romantycznej wsi Machovská Lhota , którą z jednej strony otacza Park Narodowy Gór Stołowych ze słynną Velką Hejšovina , a z drugiej strony przez Broumov Mury, popularny Adršpach oddalony jest od nas o 22 km. Region Machov to raj dla miłośników turystyki pieszej, rowerowej, narciarstwa biegowego i boulderingu. Odnajdą się tu miłośnicy zacisznej wiejskiej atmosfery i rodzinnego środowiska.",
@@ -57,7 +78,14 @@ export const pl = {
   },
 };
 export const de = {
+  pageTitle: "Pension U Lidmanů",
   upozorneni: "",
+  tiles: [
+    { alt: "Unterkunft", text: "Gemütliche Zimmer mit eigenem Bad und Frühstück inklusive." },
+    { alt: "Restaurant", text: "Tschechische Küche im Kaminraum und im Sommergarten." },
+    { alt: "Hochzeiten", text: "Gartentrauungen und festliche Bankette für Ihren großen Tag." },
+    { alt: "Natur", text: "Tor zum Heuscheuergebirge, Broumover Mauern und Adršpach-Felsen." },
+  ],
   uvod: "Unterkunft in Heuscheuergebirge, Broumovsko Region, Machovská Lhota. Ein sonniger Ort in einem attraktiven, aber unentdeckten touristischen Gebiet zwischen den Broumov Mauern und dem polnischen Heuscheuergebirge bei Adršpach. Ruhige ländliche Atmosphäre. Stilvolles Ambiente im Gebäude eines alten Gasthauses von 1884.",
   lokace:
     "Unsere Pension befindet sich im Landschaftsschutzgebiet Broumovsko im romantischen Dorf Machovská Lhota , das auf der einen Seite vom Nationalpark Heuscheuergebirge mit der berühmten Großen Heuscheuer und auf der anderen Seite von den Broumov Mauern umgeben ist, das beliebte Adršpach ist 22 km von uns entfernt. Die Region Machovsko ist ein Paradies zum Wandern, Radfahren, Langlaufen und Bouldern. Liebhaber einer ruhigen ländlichen Atmosphäre und einer familiären Umgebung werden hier ihren Platz finden.",

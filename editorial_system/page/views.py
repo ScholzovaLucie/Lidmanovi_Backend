@@ -6,8 +6,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import serializers
 from rest_framework.response import Response
 
-from editorial_system.page.models import Page
-from editorial_system.page.serializers import PageSerializer
+from editorial_system.page.models import Page, PageTranslation
+from editorial_system.page.serializers import PageSerializer, PageTranslationSerializer
 from editorial_system.page.services import TRANSLATION_MANUALLY_REVIEWED
 
 
@@ -30,7 +30,7 @@ class PageTranslationUpdateSerializer(serializers.Serializer):
                 name="lang",
                 type=OpenApiTypes.STR,
                 required=False,
-                description="Requested response language (for example: cs, en, de).",
+                description="Requested response language (for example: cs, en, de). Does not filter pages, only resolves translation.",
             ),
             OpenApiParameter(
                 name="source_lang",
@@ -47,39 +47,23 @@ class PageTranslationUpdateSerializer(serializers.Serializer):
     destroy=extend_schema(tags=["Pages"]),
 )
 class PageViewSet(viewsets.ModelViewSet):
-    queryset = Page.objects.all()
+    queryset = Page.objects.prefetch_related("translations").all()
     serializer_class = PageSerializer
 
     def get_permissions(self):
-        if self.action in ["list", "retrieve"]:
+        if self.action in ["list", "retrieve", "translations"]:
             return [AllowAny()]
         return [IsAuthenticated()]
 
     def get_queryset(self):
         queryset = super().get_queryset()
         path = self.request.query_params.get("path", "").strip()
-        lang = self.request.query_params.get("lang", "").strip().lower()
         source_lang = self.request.query_params.get("source_lang", "").strip().lower()
 
         if path:
             queryset = queryset.filter(path=path)
         if source_lang:
             queryset = queryset.filter(lang=source_lang)
-            return queryset
-
-        if lang and path:
-            exact_match = queryset.filter(lang=lang)
-            if exact_match.exists():
-                return exact_match
-
-            source_fallback = queryset.filter(lang="cs")
-            if source_fallback.exists():
-                return source_fallback
-
-            return queryset.order_by("id")[:1]
-
-        if lang and not path:
-            queryset = queryset.filter(lang=lang)
 
         return queryset
 
@@ -146,13 +130,25 @@ class PageViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         tags=["Pages"],
+        methods=["get"],
+        responses=PageTranslationSerializer(many=True),
+        description="List all translations for a page.",
+    )
+    @extend_schema(
+        tags=["Pages"],
+        methods=["patch"],
         request=PageTranslationUpdateSerializer,
         responses=PageSerializer,
-        description="Manually override translation for one language.",
+        description="Manually override translation for one language. Marks it as manually_reviewed.",
     )
-    @action(detail=True, methods=["patch"], url_path="translations")
+    @action(detail=True, methods=["get", "patch"], url_path="translations")
     def translations(self, request, pk=None):
         page = self.get_object()
+
+        if request.method == "GET":
+            serializer = PageTranslationSerializer(page.translations.all(), many=True)
+            return Response(serializer.data)
+
         target_lang = (request.data.get("lang") or "").strip().lower()
         content_json = request.data.get("content_json")
 
@@ -167,17 +163,12 @@ class PageViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        content_i18n = dict(page.content_i18n or {})
-        translation_state_i18n = dict(page.translation_state_i18n or {})
+        PageTranslation.objects.update_or_create(
+            page=page,
+            lang=target_lang,
+            defaults={"content_json": content_json, "state": TRANSLATION_MANUALLY_REVIEWED},
+        )
 
-        content_i18n[target_lang] = content_json
-        translation_state_i18n[target_lang] = {
-            "state": TRANSLATION_MANUALLY_REVIEWED,
-        }
-
-        page.content_i18n = content_i18n
-        page.translation_state_i18n = translation_state_i18n
-        page.save(update_fields=["content_i18n", "translation_state_i18n"])
-
+        page.refresh_from_db()
         serializer = self.get_serializer(page)
         return Response(serializer.data, status=status.HTTP_200_OK)

@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from django.core.management import call_command
 
-from editorial_system.page.models import Page
+from editorial_system.page.models import Page, PageTranslation
 from editorial_system.page.services import TRANSLATION_MANUALLY_REVIEWED
 
 
@@ -22,7 +22,7 @@ def locales_dir(tmp_path):
                 form: { title: "Contact us" },
               },
               de: {
-                pageTitle: "Kontakt",
+                pageTitle: "Kontakt DE",
               },
             };
         """,
@@ -41,27 +41,32 @@ def locales_dir(tmp_path):
 
 
 @pytest.mark.django_db
-def test_import_frontend_translations_creates_pages_and_i18n(locales_dir):
+def test_import_creates_page_and_pagetranslation_records(locales_dir):
     call_command("import_frontend_translations", locales_dir=str(locales_dir), source_lang="cs")
 
     kontakt = Page.objects.get(path="/kontakt", lang="cs")
     index = Page.objects.get(path="/", lang="cs")
 
     assert kontakt.content_json == {"pageTitle": "Kontakt", "form": {"title": "Kontaktujte nas"}}
-    assert kontakt.content_i18n["en"] == {"pageTitle": "Contact", "form": {"title": "Contact us"}}
-    assert kontakt.content_i18n["de"] == {"pageTitle": "Kontakt"}
     assert index.content_json == {"pageTitle": "Domu"}
-    assert index.content_i18n["en"] == {"pageTitle": "Home"}
+
+    en = PageTranslation.objects.get(page=kontakt, lang="en")
+    de = PageTranslation.objects.get(page=kontakt, lang="de")
+    assert en.content_json == {"pageTitle": "Contact", "form": {"title": "Contact us"}}
+    assert de.content_json == {"pageTitle": "Kontakt DE"}
+
+    index_en = PageTranslation.objects.get(page=index, lang="en")
+    assert index_en.content_json == {"pageTitle": "Home"}
 
 
 @pytest.mark.django_db
-def test_import_frontend_translations_respects_if_empty(locales_dir):
-    Page.objects.create(
+def test_import_respects_if_empty_for_existing_source(locales_dir):
+    page = Page.objects.create(
         path="/kontakt",
         lang="cs",
         content_json={"pageTitle": "Existing source"},
-        content_i18n={"en": {"pageTitle": "Existing translation"}},
     )
+    PageTranslation.objects.create(page=page, lang="en", content_json={"pageTitle": "Existing EN"})
 
     call_command(
         "import_frontend_translations",
@@ -71,36 +76,40 @@ def test_import_frontend_translations_respects_if_empty(locales_dir):
         if_empty=True,
     )
 
-    kontakt = Page.objects.get(path="/kontakt", lang="cs")
-    assert kontakt.content_json == {"pageTitle": "Existing source"}
-    assert kontakt.content_i18n["en"] == {"pageTitle": "Existing translation"}
-    assert kontakt.content_i18n["de"] == {"pageTitle": "Kontakt"}
+    page.refresh_from_db()
+    assert page.content_json["pageTitle"] == "Existing source"
+
+    en = PageTranslation.objects.get(page=page, lang="en")
+    assert en.content_json["pageTitle"] == "Existing EN"
+
+    de = PageTranslation.objects.get(page=page, lang="de")
+    assert de.content_json["pageTitle"] == "Kontakt DE"
 
 
 @pytest.mark.django_db
-def test_import_frontend_translations_preserves_manual_review_without_overwrite(locales_dir):
-    Page.objects.create(
-        path="/kontakt",
-        lang="cs",
-        content_json={"pageTitle": "Kontakt"},
-        content_i18n={"en": {"pageTitle": "Manual"}},
-        translation_state_i18n={"en": {"state": TRANSLATION_MANUALLY_REVIEWED}},
+def test_import_preserves_manually_reviewed_without_overwrite(locales_dir):
+    page = Page.objects.create(path="/kontakt", lang="cs", content_json={"pageTitle": "Kontakt"})
+    PageTranslation.objects.create(
+        page=page,
+        lang="en",
+        content_json={"pageTitle": "Manual EN"},
+        state=TRANSLATION_MANUALLY_REVIEWED,
     )
 
     call_command("import_frontend_translations", locales_dir=str(locales_dir), source_lang="cs")
 
-    kontakt = Page.objects.get(path="/kontakt", lang="cs")
-    assert kontakt.content_i18n["en"] == {"pageTitle": "Manual"}
+    en = PageTranslation.objects.get(page=page, lang="en")
+    assert en.content_json["pageTitle"] == "Manual EN"
 
 
 @pytest.mark.django_db
-def test_import_frontend_translations_overwrites_when_requested(locales_dir):
-    Page.objects.create(
-        path="/kontakt",
-        lang="cs",
-        content_json={"pageTitle": "Old source"},
-        content_i18n={"en": {"pageTitle": "Old translation"}},
-        translation_state_i18n={"en": {"state": TRANSLATION_MANUALLY_REVIEWED}},
+def test_import_overwrites_manually_reviewed_when_overwrite_flag_set(locales_dir):
+    page = Page.objects.create(path="/kontakt", lang="cs", content_json={"pageTitle": "Old"})
+    PageTranslation.objects.create(
+        page=page,
+        lang="en",
+        content_json={"pageTitle": "Old EN"},
+        state=TRANSLATION_MANUALLY_REVIEWED,
     )
 
     call_command(
@@ -110,6 +119,17 @@ def test_import_frontend_translations_overwrites_when_requested(locales_dir):
         overwrite=True,
     )
 
+    page.refresh_from_db()
+    assert page.content_json["pageTitle"] == "Kontakt"
+    en = PageTranslation.objects.get(page=page, lang="en")
+    assert en.content_json["pageTitle"] == "Contact"
+
+
+@pytest.mark.django_db
+def test_import_does_not_create_duplicate_translations(locales_dir):
+    call_command("import_frontend_translations", locales_dir=str(locales_dir), source_lang="cs")
+    call_command("import_frontend_translations", locales_dir=str(locales_dir), source_lang="cs")
+
     kontakt = Page.objects.get(path="/kontakt", lang="cs")
-    assert kontakt.content_json["pageTitle"] == "Kontakt"
-    assert kontakt.content_i18n["en"]["pageTitle"] == "Contact"
+    assert PageTranslation.objects.filter(page=kontakt, lang="en").count() == 1
+    assert PageTranslation.objects.filter(page=kontakt, lang="de").count() == 1

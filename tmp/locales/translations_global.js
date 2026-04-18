@@ -2,6 +2,7 @@
 export const translations_global = {
   cs: {
     language: "Jazyk",
+    languageCode: "ČE",
     nav: {
       home: "Domů",
       about: "O nás",
@@ -13,6 +14,7 @@ export const translations_global = {
       priceList: "Ceník",
       gallery: "Galerie",
       reservation: "Rezervace",
+      rooms: "Pokoje",
     },
     auth: {
       login: "Přihlášení",
@@ -21,6 +23,16 @@ export const translations_global = {
     },
     footer: {
       copyright: "© {{year}} Lidmanovi",
+      brand: "Penzion U Lidmanů",
+      tagline: "Ubytování, restaurace a svatby v Machovské Lhotě.",
+      contactTitle: "Kontakt",
+      navigationTitle: "Rychlé odkazy",
+      reservationTitle: "Rezervace",
+      reservationText:
+        "Naplánujte si pobyt jednoduše online a ozvěte se nám, pokud potřebujete poradit s výběrem.",
+      reservationCta: "Přejít na rezervaci",
+      mapCta: "Zobrazit na mapě",
+      facebookCta: "Facebook",
     },
     buttons: {
       readMore: "Více informací",
@@ -32,6 +44,7 @@ export const translations_global = {
   },
   en: {
     language: "Language",
+    languageCode: "EN",
     nav: {
       home: "Home",
       about: "About us",
@@ -43,6 +56,7 @@ export const translations_global = {
       priceList: "Price list",
       gallery: "Gallery",
       reservation: "Reservation",
+      rooms: "Rooms",
     },
     auth: {
       login: "Login",
@@ -51,6 +65,16 @@ export const translations_global = {
     },
     footer: {
       copyright: "© {{year}} Lidmanovi",
+      brand: "Penzion U Lidmanů",
+      tagline: "Accommodation, restaurant and weddings in Machovska Lhota.",
+      contactTitle: "Contact",
+      navigationTitle: "Quick links",
+      reservationTitle: "Reservation",
+      reservationText:
+        "Plan your stay online and get in touch if you would like help choosing the right option.",
+      reservationCta: "Go to reservation",
+      mapCta: "Open map",
+      facebookCta: "Facebook",
     },
     buttons: {
       readMore: "Read more",
@@ -62,6 +86,7 @@ export const translations_global = {
   },
   de: {
     language: "Sprache",
+    languageCode: "DE",
     nav: {
       home: "Startseite",
       about: "Über uns",
@@ -73,6 +98,7 @@ export const translations_global = {
       priceList: "Preisliste",
       gallery: "Galerie",
       reservation: "Reservierung",
+      rooms: "Zimmer",
     },
     auth: {
       login: "Anmelden",
@@ -81,6 +107,16 @@ export const translations_global = {
     },
     footer: {
       copyright: "© {{year}} Lidmanovi",
+      brand: "Penzion U Lidmanů",
+      tagline: "Unterkunft, Restaurant und Hochzeiten in Machovska Lhota.",
+      contactTitle: "Kontakt",
+      navigationTitle: "Schnellzugriffe",
+      reservationTitle: "Reservierung",
+      reservationText:
+        "Planen Sie Ihren Aufenthalt einfach online und kontaktieren Sie uns, wenn Sie Hilfe bei der Auswahl benötigen.",
+      reservationCta: "Zur Reservierung",
+      mapCta: "Karte offnen",
+      facebookCta: "Facebook",
     },
     buttons: {
       readMore: "Mehr erfahren",
@@ -92,6 +128,7 @@ export const translations_global = {
   },
   pl: {
     language: "Język",
+    languageCode: "PO",
     nav: {
       home: "Strona główna",
       about: "O nas",
@@ -103,6 +140,7 @@ export const translations_global = {
       priceList: "Cennik",
       gallery: "Galeria",
       reservation: "Rezerwacja",
+      rooms: "Pokoje",
     },
     auth: {
       login: "Logowanie",
@@ -111,6 +149,16 @@ export const translations_global = {
     },
     footer: {
       copyright: "© {{year}} Lidmanovi",
+      brand: "Penzion U Lidmanů",
+      tagline: "Noclegi, restauracja i wesela w Machovskiej Lhocie.",
+      contactTitle: "Kontakt",
+      navigationTitle: "Szybkie linki",
+      reservationTitle: "Rezerwacja",
+      reservationText:
+        "Zaplanuj pobyt online i skontaktuj sie z nami, jesli potrzebujesz pomocy z wyborem.",
+      reservationCta: "Przejdz do rezerwacji",
+      mapCta: "Otworz mape",
+      facebookCta: "Facebook",
     },
     buttons: {
       readMore: "Więcej informacji",

@@ -5,7 +5,7 @@ from pathlib import Path
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-from editorial_system.page.models import Page
+from editorial_system.page.models import Page, PageTranslation
 from editorial_system.page.services import TRANSLATION_MANUALLY_REVIEWED
 
 
@@ -20,6 +20,9 @@ FILE_TO_PATH = {
     "translations_balicky.js": "/balicky",
     "translations_rezervace.js": "/rezervace",
     "translations_galerie.js": "/galerie",
+    "translation_cenik.js": "/cenik",
+    "translations_pokoje.js": "/pokoje",
+    "translations_gdpr.js": "/gdpr",
 }
 
 
@@ -87,6 +90,7 @@ class Command(BaseCommand):
         source_lang = options["source_lang"].strip().lower()
         overwrite = options["overwrite"]
         if_empty = options["if_empty"]
+        should_overwrite = overwrite and not if_empty
 
         if not locales_dir.exists():
             raise CommandError(f"Locales directory '{locales_dir}' does not exist.")
@@ -110,20 +114,19 @@ class Command(BaseCommand):
             page, created = Page.objects.get_or_create(
                 path=path,
                 lang=source_lang,
-                defaults={"content_json": {}, "content_i18n": {}, "translation_state_i18n": {}},
+                defaults={"content_json": {}},
             )
             if created:
                 created_count += 1
 
-            content_i18n = dict(page.content_i18n or {})
-            translation_state_i18n = dict(page.translation_state_i18n or {})
             page_changed = False
-
             source_payload = translations[source_lang]
             source_has_content = bool(page.content_json)
-            if created or (not source_has_content) or (overwrite and not if_empty):
+
+            if created or not source_has_content or should_overwrite:
                 if page.content_json != source_payload:
                     page.content_json = source_payload
+                    page.save(update_fields=["content_json"])
                     page_changed = True
             else:
                 skipped_count += 1
@@ -133,32 +136,29 @@ class Command(BaseCommand):
                 if normalized_lang == source_lang:
                     continue
 
-                existing_payload = content_i18n.get(normalized_lang)
-                existing_state = translation_state_i18n.get(normalized_lang, {}).get("state")
-                has_existing_payload = bool(existing_payload)
-                should_fill_empty = not has_existing_payload
-                should_overwrite = overwrite and not if_empty
+                existing = PageTranslation.objects.filter(page=page, lang=normalized_lang).first()
+                has_existing = existing is not None and bool(existing.content_json)
+                is_manually_reviewed = existing is not None and existing.state == TRANSLATION_MANUALLY_REVIEWED
 
-                if existing_state == TRANSLATION_MANUALLY_REVIEWED and not should_overwrite:
+                if is_manually_reviewed and not should_overwrite:
                     skipped_count += 1
                     continue
 
-                if should_fill_empty or should_overwrite:
-                    if existing_payload != payload:
-                        content_i18n[normalized_lang] = payload
+                if not has_existing or should_overwrite:
+                    if existing:
+                        if existing.content_json != payload:
+                            existing.content_json = payload
+                            existing.save(update_fields=["content_json"])
+                            page_changed = True
+                    else:
+                        PageTranslation.objects.create(page=page, lang=normalized_lang, content_json=payload)
                         page_changed = True
                 else:
                     skipped_count += 1
 
             if page_changed:
-                page.content_i18n = content_i18n
-                page.translation_state_i18n = translation_state_i18n
-                update_fields = ["content_json", "content_i18n", "translation_state_i18n"]
-                page.save(update_fields=update_fields)
                 updated_count += 1
                 self.stdout.write(self.style.SUCCESS(f"Imported {file_path.name} -> {path}"))
-            elif created:
-                page.save(update_fields=["content_json", "content_i18n", "translation_state_i18n"])
 
         self.stdout.write(
             self.style.SUCCESS(

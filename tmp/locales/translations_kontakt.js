@@ -2,41 +2,21 @@
 export const translations_kontakt = {
   cs: {
     pageTitle: "Kontakt",
-    heroAlt: [
-      "Úvodní foto 1",
-      "Úvodní foto 2",
-      "Úvodní foto 3",
-      "Úvodní foto 4",
-    ],
+    heading: "Kontaktujte nás",
     info: {
-      address: {
-        title: "Adresa",
-        lines: ["Machovská Lhota 40", "Machov 549 31"],
-        coords: "50.4975831 N, 16.2934947 E",
-      },
-      phone: {
-        title: "Telefon",
-        value: "+420 604 341 863",
-      },
-      email: {
-        title: "E-mail",
-        value: "info@ulidmanu.cz",
-        cta: "Kontaktujte nás",
-      },
-      facebook: {
-        title: "Facebook",
-        label: "Pension & Restaurace U Lidmanů",
-      },
       owner: {
-        title: "Majitel a provozovatel",
-        lines: ["Petr Šturm", "IČ: 71143416"],
+        label: "Provozovatel",
+        lines: ["Penzion U Lidmanů", "Machovská Lhota 57", "549 63 Machov"],
       },
+      phone: { label: "Telefon", value: "+420 604 341 863" },
+      email: { label: "E-mail", value: "info@ulidmanu.cz" },
+      ic: { label: "IČ", value: "71143416" },
     },
     map: {
-      title: "Mapa", // jen pro a11y (title atribut iframe)
+      title: "Mapa",
     },
     form: {
-      title: "Kontaktujte nás",
+      title: "Napište nám",
       labels: {
         name: "Jméno *",
         email: "Email *",
@@ -71,39 +51,21 @@ export const translations_kontakt = {
 
   en: {
     pageTitle: "Contact",
-    heroAlt: [
-      "Intro photo 1",
-      "Intro photo 2",
-      "Intro photo 3",
-      "Intro photo 4",
-    ],
+    heading: "Contact us",
     info: {
-      address: {
-        title: "Address",
-        lines: ["Machovská Lhota 40", "Machov 549 31"],
-        coords: "50.4975831 N, 16.2934947 E",
-      },
-      phone: {
-        title: "Phone",
-        value: "+420 604 341 863",
-      },
-      email: {
-        title: "Email",
-        value: "info@ulidmanu.cz",
-        cta: "Contact us",
-      },
-      facebook: {
-        title: "Facebook",
-        label: "Pension & Restaurant U Lidmanů",
-      },
       owner: {
-        title: "Owner & Operator",
-        lines: ["Petr Šturm", "ID: 71143416"],
+        label: "Operator",
+        lines: ["Pension U Lidmanů", "Machovská Lhota 57", "549 63 Machov"],
       },
+      phone: { label: "Phone", value: "+420 604 341 863" },
+      email: { label: "E-mail", value: "info@ulidmanu.cz" },
+      ic: { label: "ID No.", value: "71143416" },
     },
-    map: { title: "Map" },
+    map: {
+      title: "Map",
+    },
     form: {
-      title: "Contact us",
+      title: "Write to us",
       labels: {
         name: "Name *",
         email: "Email *",
@@ -138,34 +100,21 @@ export const translations_kontakt = {
 
   de: {
     pageTitle: "Kontakt",
-    heroAlt: ["Intro-Foto 1", "Intro-Foto 2", "Intro-Foto 3", "Intro-Foto 4"],
+    heading: "Kontaktieren Sie uns",
     info: {
-      address: {
-        title: "Adresse",
-        lines: ["Machovská Lhota 40", "Machov 549 31"],
-        coords: "50.4975831 N, 16.2934947 E",
-      },
-      phone: {
-        title: "Telefon",
-        value: "+420 604 341 863",
-      },
-      email: {
-        title: "E-Mail",
-        value: "info@ulidmanu.cz",
-        cta: "Kontaktieren Sie uns",
-      },
-      facebook: {
-        title: "Facebook",
-        label: "Pension & Restaurant U Lidmanů",
-      },
       owner: {
-        title: "Inhaber & Betreiber",
-        lines: ["Petr Šturm", "ID: 71143416"],
+        label: "Betreiber",
+        lines: ["Pension U Lidmanů", "Machovská Lhota 57", "549 63 Machov"],
       },
+      phone: { label: "Telefon", value: "+420 604 341 863" },
+      email: { label: "E-Mail", value: "info@ulidmanu.cz" },
+      ic: { label: "ID-Nr.", value: "71143416" },
     },
-    map: { title: "Karte" },
+    map: {
+      title: "Karte",
+    },
     form: {
-      title: "Kontaktieren Sie uns",
+      title: "Schreiben Sie uns",
       labels: {
         name: "Name *",
         email: "E-Mail *",
@@ -200,39 +149,21 @@ export const translations_kontakt = {
 
   pl: {
     pageTitle: "Kontakt",
-    heroAlt: [
-      "Zdjęcie wstępne 1",
-      "Zdjęcie wstępne 2",
-      "Zdjęcie wstępne 3",
-      "Zdjęcie wstępne 4",
-    ],
+    heading: "Skontaktuj się z nami",
     info: {
-      address: {
-        title: "Adres",
-        lines: ["Machovská Lhota 40", "Machov 549 31"],
-        coords: "50.4975831 N, 16.2934947 E",
-      },
-      phone: {
-        title: "Telefon",
-        value: "+420 604 341 863",
-      },
-      email: {
-        title: "E-mail",
-        value: "info@ulidmanu.cz",
-        cta: "Skontaktuj się z nami",
-      },
-      facebook: {
-        title: "Facebook",
-        label: "Pension & Restaurace U Lidmanů",
-      },
       owner: {
-        title: "Właściciel i operator",
-        lines: ["Petr Šturm", "ID: 71143416"],
+        label: "Operator",
+        lines: ["Pensjonat U Lidmanů", "Machovská Lhota 57", "549 63 Machov"],
       },
+      phone: { label: "Telefon", value: "+420 604 341 863" },
+      email: { label: "E-mail", value: "info@ulidmanu.cz" },
+      ic: { label: "NIP", value: "71143416" },
     },
-    map: { title: "Mapa" },
+    map: {
+      title: "Mapa",
+    },
     form: {
-      title: "Skontaktuj się z nami",
+      title: "Napisz do nas",
       labels: {
         name: "Imię i nazwisko *",
         email: "E-mail *",

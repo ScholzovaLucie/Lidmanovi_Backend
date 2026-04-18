@@ -2,6 +2,8 @@
 export const translations_restaurace = {
   cs: {
     pageTitle: "Restaurace",
+    heading: "Restaurace U Lidmanů",
+    intro: "Česká kuchyně v příjemném prostředí s krbem, letní zahrádkou a salonkem. Otevřeno pro veřejnost v sezóně, celoročně pro ubytované hosty.",
     heroAlt: "Restaurace U Lidmanů – interiér a nabídka",
     openingHours: {
       heading: "Otevírací doba restaurace pro veřejnost:",
@@ -41,6 +43,8 @@ export const translations_restaurace = {
 
   en: {
     pageTitle: "Restaurant",
+    heading: "Restaurant U Lidmanů",
+    intro: "Czech cuisine in a welcoming setting with a fireplace, summer garden and private lounge. Open to the public in season, year-round for accommodated guests.",
     heroAlt: "Restaurant U Lidmanů – interior and offer",
     openingHours: {
       heading: "Restaurant opening hours (public):",
@@ -80,6 +84,8 @@ export const translations_restaurace = {
 
   de: {
     pageTitle: "Restaurant",
+    heading: "Restaurant U Lidmanů",
+    intro: "Tschechische Küche in angenehmer Atmosphäre mit Kamin, Sommergarten und Salon. In der Saison für alle geöffnet, ganzjährig für Hausgäste.",
     heroAlt: "Restaurant U Lidmanů – Innenräume und Angebot",
     openingHours: {
       heading: "Öffnungszeiten des Restaurants (für die Öffentlichkeit):",
@@ -119,6 +125,8 @@ export const translations_restaurace = {
 
   pl: {
     pageTitle: "Restauracja",
+    heading: "Restauracja U Lidmanů",
+    intro: "Kuchnia czeska w przyjemnym otoczeniu z kominkiem, letnim ogródkiem i salonem. Otwarta dla gości w sezonie, całorocznie dla gości nocujących.",
     heroAlt: "Restauracja U Lidmanů – wnętrze i oferta",
     openingHours: {
       heading: "Godziny otwarcia restauracji (dla gości):",

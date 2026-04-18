@@ -16,6 +16,12 @@ export const translations_svatby = {
     accommodationText:
       "Nabízíme útulné pokoje přímo v pensionu, aby si vaši hosté mohli naplno užít oslavu a pohodlně přenocovat.",
     contactCta: "Kontaktujte nás pro nezávaznou nabídku",
+    tiles: [
+      { alt: "Zahrada", text: "Romantický zahradní obřad v klidném prostředí Machovské Lhoty." },
+      { alt: "Hostina", text: "Slavnostní hostina pro desítky hostů v restauraci i salonku." },
+      { alt: "Ubytování", text: "Útulné pokoje přímo v pensionu pro pohodlné přenocování hostů." },
+      { alt: "Catering", text: "Slavnostní menu na míru od tradiční české kuchyně po moderní speciality." },
+    ],
   },
 
   en: {
@@ -34,6 +40,12 @@ export const translations_svatby = {
     accommodationText:
       "We offer cozy rooms directly in the pension so your guests can fully enjoy the celebration and comfortably stay overnight.",
     contactCta: "Contact us for a non-binding offer",
+    tiles: [
+      { alt: "Garden", text: "Romantic garden ceremony in the peaceful setting of Machovská Lhota." },
+      { alt: "Reception", text: "Festive banquet for dozens of guests in the restaurant and lounge." },
+      { alt: "Accommodation", text: "Cozy rooms directly in the pension for comfortable overnight stays." },
+      { alt: "Catering", text: "Tailor-made festive menu from traditional Czech to modern specialties." },
+    ],
   },
 
   de: {
@@ -52,6 +64,12 @@ export const translations_svatby = {
     accommodationText:
       "Wir bieten gemütliche Zimmer direkt im Pension, damit Ihre Gäste die Feier voll genießen und bequem übernachten können.",
     contactCta: "Kontaktieren Sie uns für ein unverbindliches Angebot",
+    tiles: [
+      { alt: "Garten", text: "Romantische Gartentrauung in der ruhigen Umgebung von Machovská Lhota." },
+      { alt: "Feier", text: "Festliches Bankett für Dutzende Gäste im Restaurant und Salon." },
+      { alt: "Unterkunft", text: "Gemütliche Zimmer direkt in der Pension für komfortables Übernachten." },
+      { alt: "Catering", text: "Maßgeschneidertes Festmenü von tschechischer Tradition bis zu modernen Spezialitäten." },
+    ],
   },
 
   pl: {
@@ -70,5 +88,11 @@ export const translations_svatby = {
     accommodationText:
       "Oferujemy przytulne pokoje bezpośrednio w pensjonacie, aby Wasi goście mogli w pełni cieszyć się przyjęciem i wygodnie przenocować.",
     contactCta: "Skontaktuj się z nami, aby otrzymać niezobowiązującą ofertę",
+    tiles: [
+      { alt: "Ogród", text: "Romantyczna ceremonia ogrodowa w spokojnym otoczeniu Machovskiej Lhoty." },
+      { alt: "Przyjęcie", text: "Uroczyste przyjęcie dla dziesiątek gości w restauracji i salonie." },
+      { alt: "Noclegi", text: "Przytulne pokoje bezpośrednio w pensjonacie dla wygodnych noclegów." },
+      { alt: "Catering", text: "Menu weselne na miarę – od tradycyjnej kuchni czeskiej po nowoczesne specjały." },
+    ],
   },
 };

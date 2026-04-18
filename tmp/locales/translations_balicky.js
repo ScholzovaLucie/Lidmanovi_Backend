@@ -2,6 +2,25 @@
 export const translations_balicky = {
   cs: {
     pageTitle: "Pobytové balíčky",
+    heading: "Pobytové balíčky",
+    intro: "Připravili jsme pro vás výhodné balíčky pro různé délky pobytu a roční období. Každý balíček zahrnuje ubytování a snídani, některé i extra zážitky.",
+    items: [
+      {
+        title: "Prodloužený víkend ve Stolových horách",
+        description: "Pro 2 osoby (čtvrtek–neděle), březen–červen a září–listopad. Zahrnuje 3× ubytování, 3× snídani, piknikový batoh a tříchodovou večeři s vínem.",
+        price: "4 190 Kč / 2 osoby / pobyt",
+      },
+      {
+        title: "Pětidenní turisticko-poznávací pobyt na Machovsku",
+        description: "Pro 2 osoby (neděle–pátek), květen, červen, září. Zahrnuje 5× ubytování, 5× snídani a 3× balíček s občerstvením na cesty.",
+        price: "5 390 Kč / 2 osoby / pobyt",
+      },
+      {
+        title: "Týdenní dovolená na Broumovsku",
+        description: "Pro 2–4 osoby, červenec–srpen (sobota–sobota) nebo duben–říjen (neděle–neděle). Zahrnuje 7× ubytování, 7× snídani a balíček s občerstvením.",
+        price: "od 7 390 Kč / 2 osoby / pokoj",
+      },
+    ],
     packagesOrder: ["b1", "b2", "b3"],
     cards: {
       b1: {
@@ -78,6 +97,25 @@ export const translations_balicky = {
 
   en: {
     pageTitle: "Accommodation Packages",
+    heading: "Accommodation Packages",
+    intro: "We have prepared value packages for different lengths of stay and seasons. Each package includes accommodation and breakfast, some with extra experiences.",
+    items: [
+      {
+        title: "Extended Weekend in the Table Mountains",
+        description: "For 2 persons (Thu–Sun), March–June and September–November. Includes 3× nights, 3× breakfast, a picnic backpack and a three-course dinner with wine.",
+        price: "CZK 4,190 / 2 persons / stay",
+      },
+      {
+        title: "Five-day Hiking & Discovery Stay in Machov",
+        description: "For 2 persons (Sun–Fri), May, June, September. Includes 5× nights, 5× breakfast and 3× packed snacks for trips.",
+        price: "CZK 5,390 / 2 persons / stay",
+      },
+      {
+        title: "One-week Holiday in the Broumov Region",
+        description: "For 2–4 persons, July–August (Sat–Sat) or April–October (Sun–Sun). Includes 7× nights, 7× breakfast and packed snacks.",
+        price: "from CZK 7,390 / 2 persons / room",
+      },
+    ],
     packagesOrder: ["b1", "b2", "b3"],
     cards: {
       b1: {
@@ -154,6 +192,25 @@ export const translations_balicky = {
 
   de: {
     pageTitle: "Aufenthaltspakete",
+    heading: "Aufenthaltspakete",
+    intro: "Wir haben vorteilhafte Pakete für verschiedene Aufenthaltslängen und Jahreszeiten zusammengestellt. Jedes Paket enthält Unterkunft und Frühstück, manche auch besondere Extras.",
+    items: [
+      {
+        title: "Verlängertes Wochenende im Heuscheuergebirge",
+        description: "Für 2 Personen (Do–So), März–Juni und September–November. Beinhaltet 3× Übernachtung, 3× Frühstück, Picknick-Rucksack und ein Drei-Gänge-Abendessen mit Wein.",
+        price: "4.190 CZK / 2 Personen / Aufenthalt",
+      },
+      {
+        title: "Fünftägiger Wander- & Entdeckungsaufenthalt in Machov",
+        description: "Für 2 Personen (So–Fr), Mai, Juni, September. Beinhaltet 5× Übernachtung, 5× Frühstück und 3× Lunchpaket für Ausflüge.",
+        price: "5.390 CZK / 2 Personen / Aufenthalt",
+      },
+      {
+        title: "Einwöchiger Urlaub im Broumov-Gebiet",
+        description: "Für 2–4 Personen, Juli–August (Sa–Sa) oder April–Oktober (So–So). Beinhaltet 7× Übernachtung, 7× Frühstück und Lunchpaket.",
+        price: "ab 7.390 CZK / 2 Personen / Zimmer",
+      },
+    ],
     packagesOrder: ["b1", "b2", "b3"],
     cards: {
       b1: {
@@ -228,6 +285,25 @@ export const translations_balicky = {
 
   pl: {
     pageTitle: "Pakiety pobytowe",
+    heading: "Pakiety pobytowe",
+    intro: "Przygotowaliśmy atrakcyjne pakiety na różne długości pobytu i pory roku. Każdy pakiet obejmuje nocleg i śniadanie, niektóre zawierają dodatkowe atrakcje.",
+    items: [
+      {
+        title: "Przedłużony weekend w Górach Stołowych",
+        description: "Dla 2 osób (czw–nd), marzec–czerwiec i wrzesień–listopad. Obejmuje 3× nocleg, 3× śniadanie, plecak piknikowy i trzydaniową kolację z winem.",
+        price: "4 190 CZK / 2 osoby / pobyt",
+      },
+      {
+        title: "Pięciodniowy pobyt turystyczno-poznawczy w Machovie",
+        description: "Dla 2 osób (nd–pt), maj, czerwiec, wrzesień. Obejmuje 5× nocleg, 5× śniadanie i 3× pakiet prowiantowy na wycieczki.",
+        price: "5 390 CZK / 2 osoby / pobyt",
+      },
+      {
+        title: "Tygodniowe wakacje na Broumowszczyźnie",
+        description: "Dla 2–4 osób, lipiec–sierpień (sob–sob) lub kwiecień–październik (nd–nd). Obejmuje 7× nocleg, 7× śniadanie i pakiet prowiantowy.",
+        price: "od 7 390 CZK / 2 osoby / pokój",
+      },
+    ],
     packagesOrder: ["b1", "b2", "b3"],
     cards: {
       b1: {
