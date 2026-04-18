@@ -12,7 +12,7 @@ def photo_upload_to(instance, filename):
 
 class Photo(models.Model):
     category = models.CharField(max_length=100, db_index=True)
-    image = models.FileField(upload_to=photo_upload_to)
+    image = models.ImageField(upload_to=photo_upload_to)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

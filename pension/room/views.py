@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from django.utils.dateparse import parse_date
 
+from pension.reservation.enums import ReservationStatus
 from pension.reservation.models import Reservation
 from pension.room.models import Room
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
@@ -14,6 +15,13 @@ from pension.room.serializers import (
     RoomSerializer,
     PublicRoomSerializer,
 )
+
+_ACTIVE_RESERVATION_STATUSES = [
+    ReservationStatus.NEW,
+    ReservationStatus.CONFIRMED,
+    ReservationStatus.PAYMENT_PENDING,
+    ReservationStatus.PAYED,
+]
 
 
 @extend_schema_view(
@@ -54,12 +62,11 @@ from pension.room.serializers import (
         ],
     ),
 )
-class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet, mixins.CreateModelMixin):
+class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Room.objects.all()
     serializer_class = PublicRoomSerializer
     permission_classes = []
     http_method_names = ['get']
-
 
     @extend_schema(
         tags=['Rooms'],
@@ -128,19 +135,15 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
 
         total_people = adults + children
 
-        reservations = Reservation.objects.filter(
-            check_in_date__lte=to_date,
-            check_out_date__gte=from_date,
+        reserved_room_ids = Reservation.objects.filter(
+            status__in=_ACTIVE_RESERVATION_STATUSES,
+            check_in_date__lt=to_date,
+            check_out_date__gt=from_date,
+        ).values_list('rooms__id', flat=True)
+
+        available_rooms = list(
+            self.get_queryset().filter(is_active=True).exclude(id__in=reserved_room_ids)
         )
-
-        reserved_ids = reservations.values_list('rooms__id', flat=True)
-
-        rooms = self.get_queryset().exclude(id__in=reserved_ids).exclude(is_active=False)
-
-        available_rooms = [
-            r for r in rooms
-            if r.is_free(from_date, to_date)
-        ]
 
         if not available_rooms:
             return Response({
@@ -148,15 +151,12 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
                 "options": []
             })
 
-        # 1) First try to find single rooms that can fit everyone
-        single_room_options = []
-        for room in available_rooms:
-            if (
-                room.max_adults >= adults and
-                room.max_children >= children and
-                (room.max_adults + room.max_children) >= total_people
-            ):
-                single_room_options.append(room)
+        single_room_options = [
+            r for r in available_rooms
+            if r.max_adults >= adults
+            and r.max_children >= children
+            and (r.max_adults + r.max_children) >= total_people
+        ]
 
         if single_room_options:
             serialized = PublicRoomSerializer(
@@ -170,7 +170,6 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
                 "rooms": serialized
             })
 
-        # 2) If no single room fits everyone, return all free rooms
         serialized_all = PublicRoomSerializer(
             available_rooms,
             many=True,
@@ -242,11 +241,10 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
             return Response({"error": "children must be at least 0"}, status=400)
 
         if to_date <= from_date:
-            return Response({"error": "to_date must be greater than from_date"},status=400)
+            return Response({"error": "to_date must be greater than from_date"}, status=400)
 
         if room.is_active is False:
             return Response({"error": "Room is not active"}, status=400)
-
 
         available = room.is_available(from_date, to_date, adults, children)
 

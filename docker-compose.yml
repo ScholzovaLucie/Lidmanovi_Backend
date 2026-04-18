@@ -1,6 +1,6 @@
 services:
   backend:
-    command: python manage.py runserver 0.0.0.0:8000
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
@@ -25,8 +25,10 @@ services:
       INIT_SYNC_PHOTOS_FROM_MEDIA: ${INIT_SYNC_PHOTOS_FROM_MEDIA:-1}
       INIT_SYNC_PHOTOS_ONLY_IF_EMPTY: ${INIT_SYNC_PHOTOS_ONLY_IF_EMPTY:-1}
       MEDIA_PHOTOS_DIR: ${MEDIA_PHOTOS_DIR:-/app/media/galerie}
+      DEBUG: ${DEBUG:-True}
 
   db:
+    restart: always
     image: postgres:16
     container_name: postgres
     environment:

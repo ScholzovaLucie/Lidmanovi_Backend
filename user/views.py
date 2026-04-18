@@ -126,9 +126,9 @@ class UserViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         serializer = PasswordResetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        uid = serializer.validated_data["uid"]
         token = serializer.validated_data["token"]
         new_password = serializer.validated_data["new_password"]
-        uid = request.data.get("uid")
 
         try:
             user_id = force_str(urlsafe_base64_decode(uid))

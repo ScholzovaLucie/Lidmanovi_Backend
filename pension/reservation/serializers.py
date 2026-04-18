@@ -78,7 +78,6 @@ class RoomReservationCreateSerializer(serializers.Serializer):
         return data
 
 
-
 class ReservationCreateSerializer(serializers.ModelSerializer):
     message = serializers.CharField(
         required=False,
@@ -171,36 +170,23 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
             if guest is None:
                 guest = Guest.objects.create(**guest_data)
 
-            if not validated_data.get("num_adults") or validated_data.get("num_adults") == 0:
-                amount = 0
-                for room in rooms:
-                    amount += room['num_adults']
-                validated_data['num_adults'] = amount
+            if not validated_data.get("num_adults"):
+                validated_data['num_adults'] = sum(r['num_adults'] for r in rooms)
 
-            if not validated_data.get("num_children") or validated_data.get("num_children") == 0:
-                amount = 0
-                for room in rooms:
-                    amount += room['num_children']
-                validated_data['num_children'] = amount
+            if not validated_data.get("num_children"):
+                validated_data['num_children'] = sum(r['num_children'] for r in rooms)
 
-            reservation = Reservation.objects.create(
-                primary_guest=guest,
-                **validated_data
-            )
+            reservation = Reservation(primary_guest=guest, **validated_data)
 
             try:
                 reservation.validate_rooms(rooms)
             except DjangoValidationError as exc:
                 raise serializers.ValidationError(exc.messages)
-            for room in rooms:
-                try:
-                    room = Room.objects.get(id=room['id'])
-                except Room.DoesNotExist:
-                    raise serializers.ValidationError(f"Room {room['id']} does not exist.")
-                reservation.rooms.add(room)
 
-            reservation.price = reservation.calculate_price(rooms)
             reservation.save()
+            reservation.rooms.add(*[room_data['room'] for room_data in rooms])
+            reservation.price = reservation.calculate_price(rooms)
+            reservation.save(update_fields=['price'])
 
             return reservation
 
@@ -217,7 +203,6 @@ class ReservationUpdateSerializer(serializers.ModelSerializer):
         fields = [
             'status',
         ]
-
 
 
 class ReservationCancelSerializer(serializers.ModelSerializer):

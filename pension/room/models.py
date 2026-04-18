@@ -57,16 +57,4 @@ class Room(models.Model):
     def is_available(self, from_date, to_date, adults, children):
         if not self.can_fit(adults, children):
             return False
-
-        overlapping = self.reservations.filter(
-            status__in=[
-                ReservationStatus.NEW,
-                ReservationStatus.CONFIRMED,
-                ReservationStatus.PAYMENT_PENDING,
-                ReservationStatus.PAYED,
-            ],
-            check_in_date__lt=to_date,
-            check_out_date__gt=from_date,
-        ).exists()
-
-        return not overlapping
+        return self.is_free(from_date, to_date)

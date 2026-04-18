@@ -11,7 +11,7 @@ from pension.reservation.enums import ReservationStatus
 from pension.room.models import Room
 
 
-STATSU_MAP_TO_MAIL = {
+STATUS_MAP_TO_MAIL = {
     ReservationStatus.NEW: "reservation_received",
     ReservationStatus.CONFIRMED: "reservation_approved",
     ReservationStatus.CANCELLED: "reservation_rejected",
@@ -19,18 +19,22 @@ STATSU_MAP_TO_MAIL = {
     ReservationStatus.DONE: "reservation_done",
 }
 
+# Keep old name as alias for backwards compatibility during transition
+STATSU_MAP_TO_MAIL = STATUS_MAP_TO_MAIL
+
 
 class Reservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    check_in_date = models.DateField()
-    check_out_date = models.DateField()
+    check_in_date = models.DateField(db_index=True)
+    check_out_date = models.DateField(db_index=True)
 
     number = models.CharField(max_length=20, unique=True)
 
     status = models.CharField(
         max_length=20,
         choices=ReservationStatus.choices,
-        default=ReservationStatus.NEW
+        default=ReservationStatus.NEW,
+        db_index=True,
     )
 
     num_adults = models.PositiveIntegerField(validators=[MinValueValidator(1)])
@@ -54,16 +58,18 @@ class Reservation(models.Model):
         related_name="reservations"
     )
 
+    _MAX_NUMBER_ATTEMPTS = 10
+
     @staticmethod
     def _generate_number():
-        # Format: R-YYYYMMDD-XXXXXX
         date_part = timezone.now().strftime("%Y%m%d")
         alphabet = string.digits
-        while True:
+        for _ in range(Reservation._MAX_NUMBER_ATTEMPTS):
             suffix = ''.join(secrets.choice(alphabet) for _ in range(6))
             number = f"R-{date_part}-{suffix}"
             if not Reservation.objects.filter(number=number).exists():
                 return number
+        raise RuntimeError("Could not generate a unique reservation number after multiple attempts.")
 
     def save(self, *args, **kwargs):
         if not self.number:
@@ -72,39 +78,31 @@ class Reservation(models.Model):
 
     def validate_rooms(self, rooms):
         """
-        rooms: [
-            {
-                "id",
-                "num_adults",
-                "num_children",
-            }
-        ]
-
+        rooms: [{"id", "num_adults", "num_children"}]
+        Enriches each room dict with a 'room' key containing the Room instance.
         """
         if not rooms:
             raise ValidationError("At least one room must be selected.")
 
+        room_ids = [r['id'] for r in rooms]
+        rooms_map = {r.id: r for r in Room.objects.filter(id__in=room_ids)}
+
         total_people = self.num_adults + self.num_children
 
-        # 1️⃣ kapacita
         for room_data in rooms:
-            try:
-                room = Room.objects.get(id=room_data['id'])
-            except Room.DoesNotExist:
+            room = rooms_map.get(room_data['id'])
+            if room is None:
                 raise ValidationError(f"Room {room_data['id']} does not exist.")
             if not room.can_fit(room_data['num_adults'], room_data['num_children']):
                 raise ValidationError(f"Room {room_data['id']} does not have enough capacity.")
             room_data['room'] = room
 
-        capacity_sum = sum(room["room"].capacity for room in rooms)
+        capacity_sum = sum(room_data['room'].capacity for room_data in rooms)
         if capacity_sum < total_people:
-            raise ValidationError(
-                "Selected rooms do not have enough capacity."
-            )
+            raise ValidationError("Selected rooms do not have enough capacity.")
 
-        # 2️⃣ kolize rezervací
-        for room in rooms:
-            overlapping = room["room"].reservations.filter(
+        for room_data in rooms:
+            overlapping = room_data['room'].reservations.filter(
                 status__in=[
                     ReservationStatus.NEW,
                     ReservationStatus.CONFIRMED,
@@ -117,9 +115,8 @@ class Reservation(models.Model):
 
             if overlapping:
                 raise ValidationError(
-                    f"Room {room['id']} is not available for selected dates."
+                    f"Room {room_data['id']} is not available for selected dates."
                 )
-
 
     @property
     def nights(self):
@@ -127,31 +124,22 @@ class Reservation(models.Model):
             return 0
         return (self.check_out_date - self.check_in_date).days
 
-
     def calculate_price(self, rooms):
         """
-            rooms: [
-                {
-                    "id",
-                    "num_adults",
-                    "num_children",
-                }
-            ]
-
-            """
+        rooms: [{"id", "num_adults", "num_children", "room"?}]
+        Uses cached 'room' key if present (set by validate_rooms), otherwise fetches.
+        """
         price = 0
-
         for room_data in rooms:
-            try:
-                room = Room.objects.get(id=room_data['id'])
-            except Room.DoesNotExist:
-                raise ValidationError(f"Room {room_data['id']} does not exist.")
-
+            room = room_data.get('room')
+            if room is None:
+                try:
+                    room = Room.objects.get(id=room_data['id'])
+                except Room.DoesNotExist:
+                    raise ValidationError(f"Room {room_data['id']} does not exist.")
             price += room.calculate_price_per_day(room_data['num_adults'], room_data['num_children'])
 
         if self.nights == 0:
             return 0
 
-        price = price * self.nights
-
-        return price
+        return price * self.nights

@@ -5,26 +5,26 @@ from emails.constants import EmailType
 
 class SendEmailSerializer(serializers.Serializer):
     recipient = serializers.EmailField()
-    message = serializers.CharField()
     type = serializers.ChoiceField(choices=EmailType.CHOICES)
 
-    recipient_name = serializers.CharField()
-    date_from = serializers.DateField()
-    date_to = serializers.DateField()
-    persons = serializers.IntegerField(help_text="Number of persons")
-    reason = serializers.CharField(help_text="Reason")
+    recipient_name = serializers.CharField(required=False, allow_blank=True)
+    message = serializers.CharField(required=False, allow_blank=True)
+    date_from = serializers.DateField(required=False, allow_null=True)
+    date_to = serializers.DateField(required=False, allow_null=True)
+    persons = serializers.IntegerField(required=False, allow_null=True, help_text="Number of persons")
+    reason = serializers.CharField(required=False, allow_blank=True, help_text="Reason")
 
     def validate(self, attrs):
-        to_date = attrs["date_to"]
-        from_date = attrs["date_from"]
-        if to_date <= from_date:
-            raise serializers.ValidationError("to_date must be greater than from_date")
-
+        from_date = attrs.get("date_from")
+        to_date = attrs.get("date_to")
+        if from_date and to_date and to_date <= from_date:
+            raise serializers.ValidationError("date_to must be greater than date_from")
         return attrs
 
 
 class SendEmailResponseSerializer(serializers.Serializer):
     status = serializers.CharField()
+
 
 class ErrorResponseSerializer(serializers.Serializer):
     detail = serializers.CharField()

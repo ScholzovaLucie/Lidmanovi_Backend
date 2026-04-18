@@ -1,5 +1,4 @@
 import logging
-from random import choices
 
 from django.db.models import Q
 from drf_spectacular.plumbing import build_basic_type
@@ -8,7 +7,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
 from emails.services import send_templated_email
-from pension.reservation.models import Reservation, ReservationStatus, STATSU_MAP_TO_MAIL
+from pension.reservation.models import Reservation, ReservationStatus, STATUS_MAP_TO_MAIL
 
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
@@ -22,10 +21,14 @@ from pension.reservation.serializers import (
 LOGGER_EMAIL = logging.getLogger("emails")
 
 
+def _get_room_names(reservation):
+    return ", ".join(reservation.rooms.values_list('name', flat=True))
+
+
 @extend_schema_view(
 )
 class PublicReservationViewSet(viewsets.GenericViewSet):
-    queryset = Reservation.objects.all()
+    queryset = Reservation.objects.select_related('primary_guest').prefetch_related('rooms')
     permission_classes = []
 
     def get_serializer_class(self):
@@ -49,6 +52,8 @@ class PublicReservationViewSet(viewsets.GenericViewSet):
         data = read_serializer.data
         instance = read_serializer.instance
 
+        room_names = ", ".join(r['name'] for r in data['rooms'])
+
         send_templated_email(
             email_type="reservation_received",
             recipient=instance.primary_guest.email,
@@ -59,7 +64,7 @@ class PublicReservationViewSet(viewsets.GenericViewSet):
                 "adults": instance.num_adults,
                 "children": instance.num_children,
                 "price": instance.price,
-                "room_type": ", ".join(list(instance.rooms.all().values_list('name', flat=True))),
+                "room_type": room_names,
             },
         )
 
@@ -139,7 +144,7 @@ class PublicReservationViewSet(viewsets.GenericViewSet):
     retrieve=extend_schema(tags=['Reservations']),
 )
 class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Reservation.objects.all()
+    queryset = Reservation.objects.select_related('primary_guest').prefetch_related('rooms')
     permission_classes = [IsAdminUser]
 
     @staticmethod
@@ -165,7 +170,7 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
             raise serializers.ValidationError({name: "Invalid date format. Use YYYY-MM-DD."})
 
     def get_queryset(self):
-        queryset = Reservation.objects.all()
+        queryset = Reservation.objects.select_related('primary_guest').prefetch_related('rooms')
 
         reservation_from = self._parse_date_param('reservation_from')
         reservation_to = self._parse_date_param('reservation_to')
@@ -235,12 +240,14 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
     )
     @decorators.action(detail=False, methods=['get'], url_path='by-date')
     def get_operation_by_date(self, request):
-        from_date = request.query_params.get('from_date')
-        to_date = request.query_params.get('to_date')
-        reservations = self._apply_default_ordering(Reservation.objects.filter(
-            check_in_date__lte=to_date,
-            check_out_date__gte=from_date,
-        ))
+        from_date = self._parse_date_param('from_date')
+        to_date = self._parse_date_param('to_date')
+        reservations = self._apply_default_ordering(
+            Reservation.objects.select_related('primary_guest').prefetch_related('rooms').filter(
+                check_in_date__lte=to_date,
+                check_out_date__gte=from_date,
+            )
+        )
         page = self.paginate_queryset(reservations)
         if page is not None:
             serializer = ReservationReadSerializer(page, many=True)
@@ -267,7 +274,9 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
     def get_operation_by_status(self, request):
         status = request.query_params.get('status')
 
-        reservations = self._apply_default_ordering(Reservation.objects.filter(status=status))
+        reservations = self._apply_default_ordering(
+            Reservation.objects.select_related('primary_guest').prefetch_related('rooms').filter(status=status)
+        )
 
         page = self.paginate_queryset(reservations)
         if page is not None:
@@ -296,7 +305,7 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
             reservation.status = status
             reservation.save(update_fields=["status"])
 
-            template_name = STATSU_MAP_TO_MAIL.get(status)
+            template_name = STATUS_MAP_TO_MAIL.get(status)
             if not template_name:
                 LOGGER_EMAIL.warning(f"Unknown status {status} email not sent")
 
@@ -311,7 +320,7 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
                         "adults": reservation.num_adults,
                         "children": reservation.num_children,
                         "price": reservation.price,
-                        "room_type": ", ".join(list(reservation.rooms.all().values_list('name', flat=True))),
+                        "room_type": _get_room_names(reservation),
                     },
                 )
                 LOGGER_EMAIL.info(f"Email {template_name} sent to {reservation.primary_guest.email}")
@@ -335,7 +344,7 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
         cancel_reason = data['cancel_reason']
 
         reservation.status = ReservationStatus.CANCELLED
-        reservation.save()
+        reservation.save(update_fields=["status"])
 
         send_templated_email(
             email_type="reservation_rejected",
@@ -347,7 +356,7 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
                 "adults": reservation.num_adults,
                 "children": reservation.num_children,
                 "price": reservation.price,
-                "room_type": ", ".join(list(reservation.rooms.all().values_list('name', flat=True))),
+                "room_type": _get_room_names(reservation),
                 "reason": cancel_reason
             },
         )
