@@ -67,6 +67,8 @@ MIDDLEWARE = [
 ]
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3001",
+    "http://127.0.0.1:5174",
     "http://localhost:5173",
     "https://lidmanovi-fe.bajerlukas.cz",
 ]
@@ -171,6 +173,8 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 EMAIL_TIMEOUT = 10
+
+GOOGLE_MAPS_PLACE_URL = os.environ.get("GOOGLE_MAPS_PLACE_URL", "")
 
 LOGGING = {
     "version": 1,

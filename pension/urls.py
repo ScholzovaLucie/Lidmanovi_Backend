@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework import routers
 
 from pension.guest.views import GuestViewSet
+from pension.place_rating.views import PlaceRatingView
 from pension.reservation.views import PublicReservationViewSet, PrivateReservationViewSet
 from pension.room.views import PublicRoomViewSet, PrivateRoomViewSet
 
@@ -14,4 +15,5 @@ router.register(r'admin/reservations', PrivateReservationViewSet, basename='admi
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('public/place-rating/', PlaceRatingView.as_view(), name='place-rating'),
 ]
