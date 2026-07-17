@@ -1,9 +1,14 @@
-<h2>{{ subject }}</h2>
+{% extends "emails/base_email.html" %}
 
-<p>Dobrý den {{ name }},</p>
+{% block content %}
+<p style="font-family:Georgia,serif;font-size:18px;color:#2c1810;margin:16px 0 20px;">Dobrý den, <strong>{{ name }}</strong>,</p>
 
-<p>
-{{ message }}
+<p style="font-family:Georgia,serif;font-size:15px;color:#3a2a18;line-height:1.7;">
+  {{ message }}
 </p>
 
-<p>S pozdravem<br>Restaurace u Lidmanů</p>
+<p style="font-family:Georgia,serif;font-size:15px;color:#3a2a18;line-height:1.7;margin-top:24px;">
+  S pozdravem,<br>
+  <span style="color:#6b4c2a;font-style:italic;">Tým Restaurace u Lidmanů</span>
+</p>
+{% endblock %}
