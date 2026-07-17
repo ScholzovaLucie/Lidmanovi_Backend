@@ -20,3 +20,16 @@ class Photo(models.Model):
 
     def __str__(self):
         return f"{self.category} #{self.id}"
+
+
+class PhotoPlacement(models.Model):
+    photo = models.ForeignKey(Photo, on_delete=models.CASCADE, related_name="placements")
+    location = models.CharField(max_length=100, db_index=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["location", "order"]
+        unique_together = [("photo", "location")]
+
+    def __str__(self):
+        return f"{self.location} → Photo #{self.photo_id} (order {self.order})"

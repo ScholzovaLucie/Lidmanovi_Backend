@@ -10,3 +10,5 @@ pytest-django>=4.8
 pytest-mock>=3.12
 pytest
 six>=1.16
+cloudinary>=1.36
+django-cloudinary-storage>=0.3

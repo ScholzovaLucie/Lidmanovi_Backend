@@ -5,22 +5,30 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from editorial_system.photo.models import Photo
-from editorial_system.photo.serializers import PhotoIdsRequestSerializer, PhotoSerializer, PhotoUploadSerializer
+from editorial_system.photo.models import Photo, PhotoPlacement
+from editorial_system.photo.serializers import (
+    PhotoIdsRequestSerializer,
+    PhotoPlacementSerializer,
+    PhotoPlacementWriteSerializer,
+    PhotoSerializer,
+    PhotoUploadSerializer,
+)
 
 
 @extend_schema_view(
     list=extend_schema(tags=["Photos"], responses=PhotoSerializer(many=True)),
     create=extend_schema(tags=["Photos"], request=PhotoUploadSerializer),
+    destroy=extend_schema(tags=["Photos"]),
 )
 class PhotoViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
     queryset = Photo.objects.all()
     parser_classes = [JSONParser, MultiPartParser, FormParser]
-    http_method_names = ["get", "post"]
+    http_method_names = ["get", "post", "delete"]
 
     def get_permissions(self):
         if self.action in ["list", "by_ids", "by_category"]:
@@ -112,3 +120,51 @@ class PhotoViewSet(
         photo = serializer.save()
         response_serializer = PhotoSerializer(photo, context=self.get_serializer_context())
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema_view(
+    list=extend_schema(
+        tags=["Photo Placements"],
+        parameters=[
+            OpenApiParameter(
+                name="location",
+                type=OpenApiTypes.STR,
+                required=False,
+                description="Filter placements by location (e.g. 'hero', 'gallery').",
+            ),
+        ],
+        responses=PhotoPlacementSerializer(many=True),
+    ),
+    create=extend_schema(tags=["Photo Placements"], request=PhotoPlacementWriteSerializer),
+    partial_update=extend_schema(tags=["Photo Placements"], request=PhotoPlacementWriteSerializer),
+    destroy=extend_schema(tags=["Photo Placements"]),
+)
+class PhotoPlacementViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = PhotoPlacement.objects.select_related("photo").all()
+    http_method_names = ["get", "post", "patch", "delete"]
+
+    def get_permissions(self):
+        if self.action == "list":
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    def get_serializer_class(self):
+        if self.action in ["create", "partial_update"]:
+            return PhotoPlacementWriteSerializer
+        return PhotoPlacementSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        location = self.request.query_params.get("location")
+        if location:
+            qs = qs.filter(location__iexact=location)
+        return qs
+
+    def get_serializer_context(self):
+        return super().get_serializer_context()

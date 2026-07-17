@@ -3,13 +3,14 @@ from rest_framework import routers
 
 from editorial_system.page.views import PageViewSet
 from editorial_system.info_box.views import InfoBoxViewSet, PublicInfoBoxViewSet
-from editorial_system.photo.views import PhotoViewSet
+from editorial_system.photo.views import PhotoViewSet, PhotoPlacementViewSet
 
 router = routers.DefaultRouter()
 router.register(r'pages', PageViewSet, basename='pages')
 router.register(r'info-boxes', InfoBoxViewSet, basename='info-boxes')
 router.register(r'public/info-boxes', PublicInfoBoxViewSet, basename='public-info-boxes')
 router.register(r'photos', PhotoViewSet, basename='photos')
+router.register(r'photo-placements', PhotoPlacementViewSet, basename='photo-placements')
 
 
 urlpatterns = [

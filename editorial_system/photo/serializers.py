@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from editorial_system.photo.models import Photo
+from editorial_system.photo.models import Photo, PhotoPlacement
 
 
 class PhotoSerializer(serializers.ModelSerializer):
@@ -19,6 +19,9 @@ class PhotoSerializer(serializers.ModelSerializer):
         if request is None:
             return relative_url
 
+        if relative_url.startswith("http"):
+            return relative_url
+
         return request.build_absolute_uri(relative_url)
 
 
@@ -34,3 +37,21 @@ class PhotoIdsRequestSerializer(serializers.Serializer):
         child=serializers.IntegerField(min_value=1),
         allow_empty=False,
     )
+
+
+class PhotoPlacementSerializer(serializers.ModelSerializer):
+    photo = PhotoSerializer(read_only=True)
+    photo_id = serializers.PrimaryKeyRelatedField(
+        queryset=Photo.objects.all(), source="photo", write_only=True
+    )
+
+    class Meta:
+        model = PhotoPlacement
+        fields = ["id", "photo", "photo_id", "location", "order"]
+
+
+class PhotoPlacementWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PhotoPlacement
+        fields = ["id", "photo", "location", "order"]
+        read_only_fields = ["id"]
