@@ -183,6 +183,8 @@ EMAIL_TIMEOUT = 10
 
 GOOGLE_MAPS_PLACE_URL = os.environ.get("GOOGLE_MAPS_PLACE_URL", "")
 
+DATA_UPLOAD_MAX_NUMBER_FILES = 1000
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,

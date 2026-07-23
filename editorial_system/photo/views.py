@@ -1,3 +1,5 @@
+from django.core.exceptions import TooManyFilesSent
+
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import decorators, mixins, status, viewsets
@@ -92,7 +94,13 @@ class PhotoViewSet(
         return Response(response_serializer.data)
 
     def create(self, request, *args, **kwargs):
-        images = request.FILES.getlist("images")
+        try:
+            images = request.FILES.getlist("images")
+        except TooManyFilesSent:
+            return Response(
+                {"images": ["Překročen maximální počet souborů. Nahrajte méně souborů najednou."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if images:
             category = request.data.get("category")
