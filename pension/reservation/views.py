@@ -6,6 +6,7 @@ from drf_spectacular.plumbing import build_basic_type
 from rest_framework import viewsets, decorators, mixins, serializers, status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 
 from emails.services import send_templated_email
 from pension.reservation.bulk_import import BulkImportError, import_reservations
@@ -70,6 +71,12 @@ def _get_room_names(reservation):
 class PublicReservationViewSet(viewsets.GenericViewSet):
     queryset = Reservation.objects.select_related('primary_guest').prefetch_related('rooms')
     permission_classes = []
+
+    def get_throttles(self):
+        if self.action == 'create_reservation':
+            self.throttle_scope = 'reservation_create'
+            return [ScopedRateThrottle()]
+        return super().get_throttles()
 
     def get_serializer_class(self):
         if self.action == 'create':

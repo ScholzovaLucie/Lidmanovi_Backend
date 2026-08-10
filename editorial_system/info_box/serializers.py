@@ -28,10 +28,11 @@ class InfoBoxSerializer(serializers.ModelSerializer):
         }
 
     def get_is_active(self, instance):
+        # Kept in sync with PublicInfoBoxViewSet.get_queryset's starts_at/ends_at filtering.
         now = timezone.now()
         if instance.starts_at and now < instance.starts_at:
             return False
-        if instance.ends_at and now.date() > instance.ends_at.date():
+        if instance.ends_at and now > instance.ends_at:
             return False
         return True
 

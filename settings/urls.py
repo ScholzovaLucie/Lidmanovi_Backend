@@ -22,10 +22,10 @@ from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
 )
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from emails.views import SendEmailView
 from health import health_check
+from user.views import ThrottledTokenObtainPairView, ThrottledTokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -38,8 +38,8 @@ urlpatterns = [
     path('user/', include('user.urls')),
     path('editorial_system/', include('editorial_system.urls')),
 
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/token/", ThrottledTokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", ThrottledTokenRefreshView.as_view(), name="token_refresh"),
 
     path("api/send-email/", SendEmailView.as_view(), name="send-email")
 ]

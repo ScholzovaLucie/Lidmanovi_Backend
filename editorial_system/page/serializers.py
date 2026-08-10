@@ -3,7 +3,7 @@ from rest_framework import serializers
 from common.i18n import extract_requested_language
 from common.schema import JSONObjectField
 from editorial_system.page.models import Page, PageTranslation
-from editorial_system.page.services import get_translated_content, TRANSLATION_MANUALLY_REVIEWED
+from editorial_system.page.services import resolve_translation, TRANSLATION_MANUALLY_REVIEWED
 
 
 class PageTranslationSerializer(serializers.ModelSerializer):
@@ -61,19 +61,17 @@ class PageSerializer(serializers.ModelSerializer):
         requested_lang = extract_requested_language(request=request, default_language=instance.lang)
         normalized_requested_lang = (requested_lang or instance.lang).strip().lower()
 
-        data["content_json"] = get_translated_content(
-            page=instance,
-            requested_lang=normalized_requested_lang,
-        )
+        translation = resolve_translation(page=instance, requested_lang=normalized_requested_lang)
 
         if normalized_requested_lang == instance.lang:
+            data["content_json"] = instance.content_json
             data["translation_status"] = "source_of_truth"
+        elif translation is not None:
+            data["content_json"] = translation.content_json
+            data["translation_status"] = translation.state or "missing"
         else:
-            translation = next(
-                (t for t in instance.translations.all() if t.lang == normalized_requested_lang),
-                None,
-            )
-            data["translation_status"] = (translation.state if translation and translation.state else "missing")
+            data["content_json"] = instance.content_json
+            data["translation_status"] = "missing"
 
         data["requested_lang"] = normalized_requested_lang
 

@@ -1,12 +1,15 @@
 import json
+import logging
 
+import cloudinary.exceptions
 from django.core.exceptions import TooManyFilesSent
+from django.db import transaction
 
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import decorators, mixins, status, viewsets
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 
 from editorial_system.photo.models import Photo, PhotoPlacement
@@ -18,6 +21,8 @@ from editorial_system.photo.serializers import (
     PhotoUpdateSerializer,
     PhotoUploadSerializer,
 )
+
+LOGGER = logging.getLogger(__name__)
 
 
 @extend_schema_view(
@@ -40,7 +45,7 @@ class PhotoViewSet(
     def get_permissions(self):
         if self.action in ["list", "by_ids", "by_category"]:
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsAdminUser()]
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -118,23 +123,34 @@ class PhotoViewSet(
                 )
 
             alt_text_i18n = request.data.get("alt_text_i18n", {})
-            if isinstance(alt_text_i18n, str):
+            if isinstance(alt_text_i18n, str) and alt_text_i18n:
                 try:
-                    alt_text_i18n = json.loads(alt_text_i18n) if alt_text_i18n else {}
+                    alt_text_i18n = json.loads(alt_text_i18n)
                 except ValueError:
-                    alt_text_i18n = {}
+                    return Response(
+                        {"alt_text_i18n": ["Must be a valid JSON object."]},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
 
             created_photos = []
-            for image in images:
-                serializer = self.get_serializer(
-                    data={
-                        "category": category,
-                        "image": image,
-                        "alt_text_i18n": alt_text_i18n,
-                    }
+            try:
+                with transaction.atomic():
+                    for image in images:
+                        serializer = self.get_serializer(
+                            data={
+                                "category": category,
+                                "image": image,
+                                "alt_text_i18n": alt_text_i18n,
+                            }
+                        )
+                        serializer.is_valid(raise_exception=True)
+                        created_photos.append(serializer.save())
+            except cloudinary.exceptions.Error as exc:
+                LOGGER.error("Cloudinary upload failed: %s", exc)
+                return Response(
+                    {"image": ["Image upload failed. Please try again."]},
+                    status=status.HTTP_502_BAD_GATEWAY,
                 )
-                serializer.is_valid(raise_exception=True)
-                created_photos.append(serializer.save())
 
             response_serializer = PhotoSerializer(
                 created_photos,
@@ -145,7 +161,14 @@ class PhotoViewSet(
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        photo = serializer.save()
+        try:
+            photo = serializer.save()
+        except cloudinary.exceptions.Error as exc:
+            LOGGER.error("Cloudinary upload failed: %s", exc)
+            return Response(
+                {"image": ["Image upload failed. Please try again."]},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
         response_serializer = PhotoSerializer(photo, context=self.get_serializer_context())
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
@@ -180,7 +203,7 @@ class PhotoPlacementViewSet(
     def get_permissions(self):
         if self.action == "list":
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsAdminUser()]
 
     def get_serializer_class(self):
         if self.action in ["create", "partial_update"]:

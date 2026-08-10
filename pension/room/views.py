@@ -115,8 +115,12 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
     def get_available_rooms(self, request):
         from_date_raw = request.query_params.get('from_date')
         to_date_raw = request.query_params.get('to_date')
-        adults = int(request.query_params.get('adults', 1))
-        children = int(request.query_params.get('children', 0))
+
+        try:
+            adults = int(request.query_params.get('adults', 1))
+            children = int(request.query_params.get('children', 0))
+        except (TypeError, ValueError):
+            return Response({"error": "adults and children must be integers"}, status=400)
 
         if not from_date_raw or not to_date_raw:
             return Response({"error": "from_date and to_date are required"}, status=400)
@@ -228,13 +232,23 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
     def check_availability(self, request, pk=None):
         room = self.get_object()
 
-        from_date = request.query_params.get('from_date')
-        to_date = request.query_params.get('to_date')
-        adults = int(request.query_params.get('adults', 1))
-        children = int(request.query_params.get('children', 0))
+        from_date_raw = request.query_params.get('from_date')
+        to_date_raw = request.query_params.get('to_date')
+
+        try:
+            adults = int(request.query_params.get('adults', 1))
+            children = int(request.query_params.get('children', 0))
+        except (TypeError, ValueError):
+            return Response({"error": "adults and children must be integers"}, status=400)
+
+        if not from_date_raw or not to_date_raw:
+            return Response({"error": "from_date and to_date are required"}, status=400)
+
+        from_date = parse_date(from_date_raw)
+        to_date = parse_date(to_date_raw)
 
         if not from_date or not to_date:
-            return Response({"error": "from_date and to_date are required"}, status=400)
+            return Response({"error": "Invalid date format. Use YYYY-MM-DD"}, status=400)
         if adults < 1:
             return Response({"error": "adults must be at least 1"}, status=400)
         if children < 0:

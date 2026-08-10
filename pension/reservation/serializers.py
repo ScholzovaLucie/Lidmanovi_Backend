@@ -163,9 +163,9 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
             validated_data.pop('message', None)
 
             guest = Guest.objects.filter(
-                first_name=guest_data.get('first_name'),
-                last_name=guest_data.get('last_name'),
-                email=guest_data.get('email'),
+                first_name__iexact=guest_data.get('first_name'),
+                last_name__iexact=guest_data.get('last_name'),
+                email__iexact=guest_data.get('email'),
             ).first()
             if guest is None:
                 guest = Guest.objects.create(**guest_data)
@@ -179,7 +179,7 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
             reservation = Reservation(primary_guest=guest, **validated_data)
 
             try:
-                reservation.validate_rooms(rooms)
+                reservation.validate_rooms(rooms, lock=True)
             except DjangoValidationError as exc:
                 raise serializers.ValidationError(exc.messages)
 

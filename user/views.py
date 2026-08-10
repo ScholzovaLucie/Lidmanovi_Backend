@@ -6,7 +6,10 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from rest_framework import viewsets, status, mixins
 from django.contrib.auth.models import User
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
@@ -21,6 +24,19 @@ from user.serializers import (
 
 token_generator = PasswordResetTokenGenerator()
 
+# Login/refresh are unauthenticated by nature, so they're only protected by throttling.
+_LOGIN_THROTTLE_SCOPE = "login"
+
+
+class ThrottledTokenObtainPairView(TokenObtainPairView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = _LOGIN_THROTTLE_SCOPE
+
+
+class ThrottledTokenRefreshView(TokenRefreshView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = _LOGIN_THROTTLE_SCOPE
+
 
 @extend_schema_view(
     retrieve=extend_schema(tags=["Users"]),
@@ -28,6 +44,25 @@ token_generator = PasswordResetTokenGenerator()
 class UserViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.user.is_staff:
+            return queryset
+        return queryset.filter(pk=self.request.user.pk)
+
+    def get_permissions(self):
+        # Password reset is how a locked-out, logged-out user regains access -
+        # it must stay reachable without an existing session.
+        if self.action in ("password_reset_request", "password_reset"):
+            return [AllowAny()]
+        return super().get_permissions()
+
+    def get_throttles(self):
+        if self.action in ("password_reset_request", "password_reset"):
+            self.throttle_scope = "password_reset"
+            return [ScopedRateThrottle()]
+        return super().get_throttles()
 
     # ---------------------------------------------------
     # 1) CHANGE PASSWORD

@@ -1,5 +1,6 @@
 import pytest
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from rest_framework.test import APIClient
 from pension.room.models import Room
 from pension.guest.models import Guest
@@ -49,6 +50,15 @@ def staff_client(staff_user):
     client = APIClient()
     client.force_authenticate(user=staff_user)
     return client
+
+
+@pytest.fixture(autouse=True)
+def _reset_throttle_cache():
+    # DRF throttling stores request counters in Django's cache, which otherwise persists
+    # across tests in the same process and makes unrelated tests fail with 429.
+    cache.clear()
+    yield
+    cache.clear()
 
 
 @pytest.fixture(autouse=True)

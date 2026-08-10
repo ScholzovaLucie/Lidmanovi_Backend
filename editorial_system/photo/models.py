@@ -2,6 +2,7 @@ import os
 import uuid
 
 from django.db import models
+from django.db.models.functions import Lower
 
 
 def photo_upload_to(instance, filename):
@@ -11,13 +12,17 @@ def photo_upload_to(instance, filename):
 
 
 class Photo(models.Model):
-    category = models.CharField(max_length=100, db_index=True)
+    category = models.CharField(max_length=100)
     image = models.ImageField(upload_to=photo_upload_to)
     alt_text_i18n = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["id"]
+        indexes = [
+            # by_category/PhotoAdmin filter by category__iexact, so index the lowercased value.
+            models.Index(Lower("category"), name="photo_category_lower_idx"),
+        ]
 
     def __str__(self):
         return f"{self.category} #{self.id}"

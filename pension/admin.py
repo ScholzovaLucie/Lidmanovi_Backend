@@ -22,6 +22,7 @@ class RoomAdmin(admin.ModelAdmin):
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
     list_display = ('number', 'status', 'check_in_date', 'check_out_date', 'primary_guest', 'num_adults', 'num_children', 'price')
+    list_select_related = ('primary_guest',)
     list_filter = ('status',)
     search_fields = ('number', 'primary_guest__first_name', 'primary_guest__last_name', 'primary_guest__email')
     date_hierarchy = 'check_in_date'

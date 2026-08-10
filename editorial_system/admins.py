@@ -7,14 +7,14 @@ from editorial_system.photo.models import Photo
 
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
-    list_display = ('path', 'created_at') if hasattr(Page, 'created_at') else ('path',)
+    list_display = ('path', 'lang')
     search_fields = ('path',)
 
 
 @admin.register(InfoBox)
 class InfoBoxAdmin(admin.ModelAdmin):
-    list_display = ('__str__',)
-    search_fields = ('title',) if hasattr(InfoBox, 'title') else ('__str__',)
+    list_display = ('id', 'starts_at', 'ends_at')
+    search_fields = ('title_i18n',)
 
 
 @admin.register(Photo)

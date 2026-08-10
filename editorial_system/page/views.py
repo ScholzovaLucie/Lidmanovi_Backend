@@ -6,7 +6,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework import serializers
 from rest_framework.response import Response
 
@@ -55,9 +55,11 @@ class PageViewSet(viewsets.ModelViewSet):
     serializer_class = PageSerializer
 
     def get_permissions(self):
-        if self.action in ["list", "retrieve", "translations"]:
+        if self.action in ["list", "retrieve"]:
             return [AllowAny()]
-        return [IsAuthenticated()]
+        if self.action == "translations" and self.request.method == "GET":
+            return [AllowAny()]
+        return [IsAdminUser()]
 
     def get_queryset(self):
         queryset = super().get_queryset()

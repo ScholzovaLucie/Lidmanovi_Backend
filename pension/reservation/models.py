@@ -19,9 +19,6 @@ STATUS_MAP_TO_MAIL = {
     ReservationStatus.DONE: "reservation_done",
 }
 
-# Keep old name as alias for backwards compatibility during transition
-STATSU_MAP_TO_MAIL = STATUS_MAP_TO_MAIL
-
 
 class Reservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -76,16 +73,23 @@ class Reservation(models.Model):
             self.number = self._generate_number()
         super().save(*args, **kwargs)
 
-    def validate_rooms(self, rooms):
+    def validate_rooms(self, rooms, lock=False):
         """
         rooms: [{"id", "num_adults", "num_children"}]
         Enriches each room dict with a 'room' key containing the Room instance.
+
+        lock: if True, locks the room rows (SELECT ... FOR UPDATE) for the duration of the
+        enclosing transaction, so two concurrent bookings for the same room/dates can't both
+        pass the overlap check before either commits. Must only be used inside
+        transaction.atomic() - callers that just want a read-only preview (e.g. dry-run
+        validation) should leave this False.
         """
         if not rooms:
             raise ValidationError("At least one room must be selected.")
 
         room_ids = [r['id'] for r in rooms]
-        rooms_map = {r.id: r for r in Room.objects.filter(id__in=room_ids)}
+        room_queryset = Room.objects.select_for_update() if lock else Room.objects.all()
+        rooms_map = {r.id: r for r in room_queryset.filter(id__in=room_ids)}
 
         total_people = self.num_adults + self.num_children
 
