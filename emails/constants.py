@@ -4,6 +4,7 @@ class EmailType:
     RESERVATION_REJECTED = "reservation_rejected"
     RESERVATION_PAYD = "reservation_payd"
     RESERVATION_DONE = "reservation_done"
+    VOUCHER_ORDER_RECEIVED = "voucher_order_received"
     GENERIC = "generic"
 
     CHOICES = [
@@ -12,5 +13,6 @@ class EmailType:
         (RESERVATION_REJECTED, "Reservation rejected"),
         (RESERVATION_PAYD, "Reservation payd"),
         (RESERVATION_DONE, "Reservation done"),
+        (VOUCHER_ORDER_RECEIVED, "Voucher order received"),
         (GENERIC, "Generic message"),
     ]

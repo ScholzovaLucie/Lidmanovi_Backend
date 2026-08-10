@@ -176,6 +176,7 @@ REST_FRAMEWORK = {
         "user": "1000/hour",
         "login": "10/min",
         "reservation_create": "20/hour",
+        "voucher_create": "20/hour",
         "password_reset": "5/hour",
     },
 }

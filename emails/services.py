@@ -14,6 +14,7 @@ TEMPLATES = {
     EmailType.RESERVATION_REJECTED: "emails/reservation_rejected.html",
     EmailType.RESERVATION_PAYD: "emails/reservation_payd.html",
     EmailType.RESERVATION_DONE: "emails/reservation_done.html",
+    EmailType.VOUCHER_ORDER_RECEIVED: "emails/voucher_order_received.html",
     EmailType.GENERIC: "emails/generic_message.html",
 }
 
@@ -23,6 +24,7 @@ SUBJECTS = {
     EmailType.RESERVATION_REJECTED: "Rezervace zamítnuta – Restaurace u Lidmanů",
     EmailType.RESERVATION_PAYD: "Rezervace zaplacena – Restaurace u Lidmanů",
     EmailType.RESERVATION_DONE: "Rezervace dokončena – Restaurace u Lidmanů",
+    EmailType.VOUCHER_ORDER_RECEIVED: "Objednávka poukazu přijata – Restaurace u Lidmanů",
     EmailType.GENERIC: "Zpráva z Restaurace u Lidmanů",
 }
 
