@@ -13,7 +13,7 @@ def photo_upload_to(instance, filename):
 class Photo(models.Model):
     category = models.CharField(max_length=100, db_index=True)
     image = models.ImageField(upload_to=photo_upload_to)
-    alt_text = models.CharField(max_length=255, blank=True, default="")
+    alt_text_i18n = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

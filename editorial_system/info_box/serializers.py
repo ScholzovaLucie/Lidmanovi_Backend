@@ -15,7 +15,6 @@ class InfoBoxSerializer(serializers.ModelSerializer):
         model = InfoBox
         fields = [
             "id",
-            "title",
             "title_i18n",
             "content_json",
             "starts_at",
@@ -24,7 +23,6 @@ class InfoBoxSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id"]
         extra_kwargs = {
-            "title": {"help_text": "Default info box title in the source language."},
             "starts_at": {"help_text": "Optional start date-time when the info box becomes visible."},
             "ends_at": {"help_text": "Optional end date-time when the info box stops being visible."},
         }
@@ -43,7 +41,7 @@ class InfoBoxSerializer(serializers.ModelSerializer):
         language = extract_requested_language(request=request)
 
         data["title"] = resolve_translated_value(
-            base_value=instance.title,
+            base_value=None,
             translations=instance.title_i18n,
             language=language,
         )
