@@ -12,3 +12,4 @@ pytest
 six>=1.16
 cloudinary>=1.36
 django-cloudinary-storage>=0.3
+openpyxl>=3.1

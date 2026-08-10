@@ -1,12 +1,14 @@
 import logging
+from io import BytesIO
 
 from django.db.models import Q
 from drf_spectacular.plumbing import build_basic_type
-from rest_framework import viewsets, decorators, mixins, serializers
+from rest_framework import viewsets, decorators, mixins, serializers, status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
 from emails.services import send_templated_email
+from pension.reservation.bulk_import import BulkImportError, import_reservations
 from pension.reservation.models import Reservation, ReservationStatus, STATUS_MAP_TO_MAIL
 
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
@@ -362,3 +364,53 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
         )
 
         return Response(ReservationReadSerializer(reservation).data)
+
+    @extend_schema(
+        tags=['Reservations'],
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'file': {'type': 'string', 'format': 'binary', 'description': 'The .xlsx file to import.'},
+                    'sheet': {'type': 'string', 'description': 'Sheet name to read (default: active sheet).'},
+                    'dry_run': {'type': 'boolean', 'description': 'Validate only, write nothing to the database.'},
+                },
+                'required': ['file'],
+            }
+        },
+        responses={
+            200: build_basic_type(OpenApiTypes.OBJECT),
+            400: build_basic_type(OpenApiTypes.OBJECT),
+        },
+    )
+    @decorators.action(detail=False, methods=['post'], url_path='bulk-import')
+    def bulk_import(self, request):
+        uploaded_file = request.FILES.get('file')
+        if uploaded_file is None:
+            return Response({"file": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+
+        dry_run = str(request.data.get('dry_run', 'false')).strip().lower() in ('1', 'true', 'yes', 'on')
+        sheet_name = request.data.get('sheet') or None
+
+        try:
+            import openpyxl
+        except ImportError:
+            return Response(
+                {"file": ["Server is missing the openpyxl dependency."]},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        try:
+            workbook = openpyxl.load_workbook(BytesIO(uploaded_file.read()), data_only=True)
+        except Exception as exc:
+            return Response(
+                {"file": [f"Could not read the uploaded file: {exc}"]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            result = import_reservations(workbook, sheet_name=sheet_name, dry_run=dry_run)
+        except BulkImportError as exc:
+            return Response({"file": [str(exc)]}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(result)
