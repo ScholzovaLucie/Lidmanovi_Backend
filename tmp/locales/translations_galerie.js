@@ -9,6 +9,10 @@ export const translations_galerie = {
       exterior: "Exteriér",
       interior: "Interiér",
       surroundings: "Okolí",
+      "kam-prijedete": "Kam přijedete",
+      "kde-se-vyspite": "Kde se vyspíte",
+      "kde-se-najite": "Kde se najíte",
+      ano: "Kde si řeknete ANO",
     },
   },
 
@@ -21,6 +25,10 @@ export const translations_galerie = {
       exterior: "Exterior",
       interior: "Interior",
       surroundings: "Surroundings",
+      "kam-prijedete": "Where you will arrive",
+      "kde-se-vyspite": "Where you will stay",
+      "kde-se-najite": "Where you will dine",
+      ano: 'Where you say "YES"',
     },
   },
 
@@ -33,6 +41,10 @@ export const translations_galerie = {
       exterior: "Außenbereich",
       interior: "Innenbereich",
       surroundings: "Umgebung",
+      "kam-prijedete": "Wo Sie ankommen",
+      "kde-se-vyspite": "Wo Sie übernachten",
+      "kde-se-najite": "Wo Sie essen",
+      ano: 'Wo Sie "JA" sagen',
     },
   },
 
@@ -45,6 +57,10 @@ export const translations_galerie = {
       exterior: "Zewnętrzne",
       interior: "Wnętrza",
       surroundings: "Okolica",
+      "kam-prijedete": "Dokąd przyjedziesz",
+      "kde-se-vyspite": "Gdzie będziesz spać",
+      "kde-se-najite": "Gdzie zjesz",
+      ano: 'Gdzie mówicie "TAK"',
     },
   },
 };

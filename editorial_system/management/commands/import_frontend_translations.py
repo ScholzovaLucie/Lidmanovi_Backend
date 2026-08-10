@@ -1,4 +1,5 @@
 import ast
+import copy
 import re
 from pathlib import Path
 
@@ -68,6 +69,24 @@ def parse_translations_file(file_path):
     raise CommandError(f"Could not parse translations from '{file_path}'.")
 
 
+def merge_missing_keys(existing, incoming):
+    """Add missing object keys without changing existing editorial content."""
+    merged = copy.deepcopy(existing)
+    changed = False
+
+    for key, value in incoming.items():
+        if key not in merged:
+            merged[key] = copy.deepcopy(value)
+            changed = True
+        elif isinstance(merged[key], dict) and isinstance(value, dict):
+            nested, nested_changed = merge_missing_keys(merged[key], value)
+            if nested_changed:
+                merged[key] = nested
+                changed = True
+
+    return merged, changed
+
+
 class Command(BaseCommand):
     help = "Import frontend locale files into editorial page content."
 
@@ -80,6 +99,11 @@ class Command(BaseCommand):
         parser.add_argument("--source-lang", default="cs", help="Source language stored in Page.lang (default: cs)")
         parser.add_argument("--overwrite", action="store_true", help="Overwrite already populated content.")
         parser.add_argument(
+            "--merge-missing",
+            action="store_true",
+            help="Add missing object keys without overwriting existing content.",
+        )
+        parser.add_argument(
             "--if-empty",
             action="store_true",
             help="Only fill empty fields. Takes precedence over overwrite for existing content.",
@@ -90,6 +114,7 @@ class Command(BaseCommand):
         source_lang = options["source_lang"].strip().lower()
         overwrite = options["overwrite"]
         if_empty = options["if_empty"]
+        merge_missing = options["merge_missing"]
         should_overwrite = overwrite and not if_empty
 
         if not locales_dir.exists():
@@ -128,6 +153,12 @@ class Command(BaseCommand):
                     page.content_json = source_payload
                     page.save(update_fields=["content_json"])
                     page_changed = True
+            elif merge_missing:
+                merged_payload, changed = merge_missing_keys(page.content_json, source_payload)
+                if changed:
+                    page.content_json = merged_payload
+                    page.save(update_fields=["content_json"])
+                    page_changed = True
             else:
                 skipped_count += 1
 
@@ -152,6 +183,12 @@ class Command(BaseCommand):
                             page_changed = True
                     else:
                         PageTranslation.objects.create(page=page, lang=normalized_lang, content_json=payload)
+                        page_changed = True
+                elif merge_missing:
+                    merged_payload, changed = merge_missing_keys(existing.content_json, payload)
+                    if changed:
+                        existing.content_json = merged_payload
+                        existing.save(update_fields=["content_json"])
                         page_changed = True
                 else:
                     skipped_count += 1

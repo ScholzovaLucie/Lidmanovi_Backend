@@ -9,6 +9,12 @@ export const translations_ubytovani = {
     roomsTitle: "Naše pokoje",
     roomsText:
       "K dispozici jsou dvou a čtyřlůžkové pokoje s vlastním sociálním zařízením a Wi-Fi připojením. Každý pokoj je zařízen pro pohodlný pobyt.",
+    roomsLoading: "Načítání pokojů...",
+    roomsError: "Chyba při načítání pokojů",
+    roomsEmpty: "Aktuálně nejsou k dispozici žádné pokoje.",
+    roomsListTitle: "Vyberte si svůj pokoj",
+    roomsListText:
+      "Prohlédněte si aktuální nabídku pokojů s kapacitou a cenou pro vaši rezervaci.",
     breakfastTitle: "Snídaně a restaurace",
     breakfastText:
       "Součástí pobytu je chutná snídaně. Naše restaurace nabízí českou i mezinárodní kuchyni.",
@@ -72,6 +78,12 @@ export const translations_ubytovani = {
     roomsTitle: "Our rooms",
     roomsText:
       "We provide double and quadruple rooms with private bathroom and Wi-Fi. Each room is designed for a comfortable stay.",
+    roomsLoading: "Loading rooms...",
+    roomsError: "Error loading rooms",
+    roomsEmpty: "No rooms are currently available.",
+    roomsListTitle: "Choose your room",
+    roomsListText:
+      "Browse our current room offer with capacity and price for your reservation.",
     breakfastTitle: "Breakfast and restaurant",
     breakfastText:
       "Breakfast is included in the stay. Our restaurant serves Czech and international cuisine.",
@@ -132,6 +144,12 @@ export const translations_ubytovani = {
     roomsTitle: "Unsere Zimmer",
     roomsText:
       "Wir bieten Doppel- und Vierbettzimmer mit eigenem Bad und WLAN. Jedes Zimmer ist für einen komfortablen Aufenthalt ausgestattet.",
+    roomsLoading: "Zimmer werden geladen...",
+    roomsError: "Fehler beim Laden der Zimmer",
+    roomsEmpty: "Aktuell sind keine Zimmer verfügbar.",
+    roomsListTitle: "Wählen Sie Ihr Zimmer",
+    roomsListText:
+      "Sehen Sie sich unser aktuelles Zimmerangebot mit Kapazität und Preis für Ihre Reservierung an.",
     breakfastTitle: "Frühstück und Restaurant",
     breakfastText:
       "Frühstück ist im Aufenthalt enthalten. Unser Restaurant bietet tschechische und internationale Küche.",
@@ -192,6 +210,12 @@ export const translations_ubytovani = {
     roomsTitle: "Nasze pokoje",
     roomsText:
       "Do dyspozycji są pokoje dwu- i czteroosobowe z prywatną łazienką i Wi-Fi. Każdy pokój zapewnia komfortowy pobyt.",
+    roomsLoading: "Ładowanie pokoi...",
+    roomsError: "Błąd podczas ładowania pokoi",
+    roomsEmpty: "Obecnie brak dostępnych pokoi.",
+    roomsListTitle: "Wybierz swój pokój",
+    roomsListText:
+      "Zobacz naszą aktualną ofertę pokoi z pojemnością i ceną dla Twojej rezerwacji.",
     breakfastTitle: "Śniadania i restauracja",
     breakfastText:
       "W cenie pobytu zawarte jest smaczne śniadanie. Nasza restauracja serwuje kuchnię czeską i międzynarodową.",

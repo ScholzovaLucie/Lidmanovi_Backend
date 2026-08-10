@@ -3,13 +3,22 @@ export const translations_kontakt = {
   cs: {
     pageTitle: "Kontakt",
     heading: "Kontaktujte nás",
+    subtitle: "Rádi vám poradíme s termínem i programem pobytu.",
     info: {
+      gpsTitle: "GPS",
+      ratingTitle: "Hodnocení",
+      address: {
+        title: "Adresa",
+        lines: ["Machovská Lhota 40", "Machov 549 31"],
+        coords: "50.4975831 N, 16.2934947 E",
+      },
       owner: {
+        title: "Majitel a provozovatel",
         label: "Provozovatel",
         lines: ["Penzion U Lidmanů", "Machovská Lhota 57", "549 63 Machov"],
       },
-      phone: { label: "Telefon", value: "+420 604 341 863" },
-      email: { label: "E-mail", value: "info@ulidmanu.cz" },
+      phone: { title: "Telefon", label: "Telefon", value: "+420 604 341 863" },
+      email: { title: "E-mail", label: "E-mail", value: "info@ulidmanu.cz" },
       ic: { label: "IČ", value: "71143416" },
     },
     map: {
@@ -17,6 +26,8 @@ export const translations_kontakt = {
     },
     form: {
       title: "Napište nám",
+      eyebrow: "Napište nám",
+      heading: "Pošlete zprávu",
       labels: {
         name: "Jméno *",
         email: "Email *",
@@ -52,13 +63,22 @@ export const translations_kontakt = {
   en: {
     pageTitle: "Contact",
     heading: "Contact us",
+    subtitle: "We will gladly help you with your dates and stay programme.",
     info: {
+      gpsTitle: "GPS",
+      ratingTitle: "Rating",
+      address: {
+        title: "Address",
+        lines: ["Machovská Lhota 40", "Machov 549 31"],
+        coords: "50.4975831 N, 16.2934947 E",
+      },
       owner: {
+        title: "Owner & Operator",
         label: "Operator",
         lines: ["Pension U Lidmanů", "Machovská Lhota 57", "549 63 Machov"],
       },
-      phone: { label: "Phone", value: "+420 604 341 863" },
-      email: { label: "E-mail", value: "info@ulidmanu.cz" },
+      phone: { title: "Phone", label: "Phone", value: "+420 604 341 863" },
+      email: { title: "Email", label: "E-mail", value: "info@ulidmanu.cz" },
       ic: { label: "ID No.", value: "71143416" },
     },
     map: {
@@ -66,6 +86,8 @@ export const translations_kontakt = {
     },
     form: {
       title: "Write to us",
+      eyebrow: "Write to us",
+      heading: "Send a message",
       labels: {
         name: "Name *",
         email: "Email *",
@@ -101,13 +123,22 @@ export const translations_kontakt = {
   de: {
     pageTitle: "Kontakt",
     heading: "Kontaktieren Sie uns",
+    subtitle: "Wir beraten Sie gerne zu Termin und Programm Ihres Aufenthalts.",
     info: {
+      gpsTitle: "GPS",
+      ratingTitle: "Bewertung",
+      address: {
+        title: "Adresse",
+        lines: ["Machovská Lhota 40", "Machov 549 31"],
+        coords: "50.4975831 N, 16.2934947 E",
+      },
       owner: {
+        title: "Inhaber & Betreiber",
         label: "Betreiber",
         lines: ["Pension U Lidmanů", "Machovská Lhota 57", "549 63 Machov"],
       },
-      phone: { label: "Telefon", value: "+420 604 341 863" },
-      email: { label: "E-Mail", value: "info@ulidmanu.cz" },
+      phone: { title: "Telefon", label: "Telefon", value: "+420 604 341 863" },
+      email: { title: "E-Mail", label: "E-Mail", value: "info@ulidmanu.cz" },
       ic: { label: "ID-Nr.", value: "71143416" },
     },
     map: {
@@ -115,6 +146,8 @@ export const translations_kontakt = {
     },
     form: {
       title: "Schreiben Sie uns",
+      eyebrow: "Schreiben Sie uns",
+      heading: "Nachricht senden",
       labels: {
         name: "Name *",
         email: "E-Mail *",
@@ -150,13 +183,22 @@ export const translations_kontakt = {
   pl: {
     pageTitle: "Kontakt",
     heading: "Skontaktuj się z nami",
+    subtitle: "Chętnie doradzimy w sprawie terminu i programu pobytu.",
     info: {
+      gpsTitle: "GPS",
+      ratingTitle: "Ocena",
+      address: {
+        title: "Adres",
+        lines: ["Machovská Lhota 40", "Machov 549 31"],
+        coords: "50.4975831 N, 16.2934947 E",
+      },
       owner: {
+        title: "Właściciel i operator",
         label: "Operator",
         lines: ["Pensjonat U Lidmanů", "Machovská Lhota 57", "549 63 Machov"],
       },
-      phone: { label: "Telefon", value: "+420 604 341 863" },
-      email: { label: "E-mail", value: "info@ulidmanu.cz" },
+      phone: { title: "Telefon", label: "Telefon", value: "+420 604 341 863" },
+      email: { title: "E-mail", label: "E-mail", value: "info@ulidmanu.cz" },
       ic: { label: "NIP", value: "71143416" },
     },
     map: {
@@ -164,6 +206,8 @@ export const translations_kontakt = {
     },
     form: {
       title: "Napisz do nas",
+      eyebrow: "Napisz do nas",
+      heading: "Wyślij wiadomość",
       labels: {
         name: "Imię i nazwisko *",
         email: "E-mail *",

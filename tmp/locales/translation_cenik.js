@@ -2,7 +2,10 @@
 
 export const cs = {
   pageTitle: "Ceník",
+  eyebrow: "Ceník 2026 · vč. snídaně",
+  reserveCta: "Rezervovat pobyt",
   rooms: {
+    title: "Ubytování",
     lead: "Uvedené ceny jsou za osobu a noc na pokojích včetně bufetové snídaně.",
     items: [
       { name: "Dvoulůžkový pokoj", price: "550–750 Kč za osobu a noc*" },
@@ -45,7 +48,10 @@ export const cs = {
 
 export const en = {
   pageTitle: "Price List",
+  eyebrow: "Price list 2026 · breakfast included",
+  reserveCta: "Book your stay",
   rooms: {
+    title: "Accommodation",
     lead: "Prices are per person per night in rooms, including buffet breakfast.",
     items: [
       { name: "Double room", price: "CZK 550–750 per person / night*" },
@@ -88,7 +94,10 @@ export const en = {
 
 export const de = {
   pageTitle: "Preisliste",
+  eyebrow: "Preisliste 2026 · inkl. Frühstück",
+  reserveCta: "Aufenthalt buchen",
   rooms: {
+    title: "Unterkunft",
     lead: "Die Preise gelten pro Person und Nacht im Zimmer inklusive Frühstücksbuffet.",
     items: [
       { name: "Doppelzimmer", price: "550–750 CZK pro Person / Nacht*" },
@@ -132,7 +141,10 @@ export const de = {
 
 export const pl = {
   pageTitle: "Cennik",
+  eyebrow: "Cennik 2026 · ze śniadaniem",
+  reserveCta: "Zarezerwuj pobyt",
   rooms: {
+    title: "Zakwaterowanie",
     lead: "Ceny dotyczą jednej osoby za noc w pokoju, w tym śniadania w formie bufetu.",
     items: [
       { name: "Pokój dwuosobowy", price: "550–750 CZK za osobę / noc*" },
