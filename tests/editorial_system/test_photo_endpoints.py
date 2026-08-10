@@ -76,6 +76,38 @@ def test_authenticated_user_can_upload_single_photo(auth_client, settings, tmp_p
     assert Photo.objects.count() == 1
 
 
+def test_authenticated_user_can_update_alt_text(auth_client, settings, tmp_path):
+    settings.MEDIA_ROOT = tmp_path
+
+    photo = Photo.objects.create(category="rooms", image=create_test_image())
+
+    response = auth_client.patch(
+        f"/editorial_system/photos/{photo.id}/",
+        {"alt_text_i18n": {"cs": "Pokoj s výhledem", "en": "Room with a view"}},
+        format="json",
+    )
+
+    assert response.status_code == 200
+    assert response.data["alt_text_i18n"] == {"cs": "Pokoj s výhledem", "en": "Room with a view"}
+
+    photo.refresh_from_db()
+    assert photo.alt_text_i18n == {"cs": "Pokoj s výhledem", "en": "Room with a view"}
+
+
+def test_unauthenticated_user_cannot_update_alt_text(public_client, settings, tmp_path):
+    settings.MEDIA_ROOT = tmp_path
+
+    photo = Photo.objects.create(category="rooms", image=create_test_image())
+
+    response = public_client.patch(
+        f"/editorial_system/photos/{photo.id}/",
+        {"alt_text_i18n": {"cs": "Pokoj s výhledem"}},
+        format="json",
+    )
+
+    assert response.status_code == 401
+
+
 def test_authenticated_user_can_upload_multiple_photos(auth_client, settings, tmp_path):
     settings.MEDIA_ROOT = tmp_path
 

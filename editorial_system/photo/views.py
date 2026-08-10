@@ -15,6 +15,7 @@ from editorial_system.photo.serializers import (
     PhotoPlacementSerializer,
     PhotoPlacementWriteSerializer,
     PhotoSerializer,
+    PhotoUpdateSerializer,
     PhotoUploadSerializer,
 )
 
@@ -22,17 +23,19 @@ from editorial_system.photo.serializers import (
 @extend_schema_view(
     list=extend_schema(tags=["Photos"], responses=PhotoSerializer(many=True)),
     create=extend_schema(tags=["Photos"], request=PhotoUploadSerializer),
+    partial_update=extend_schema(tags=["Photos"], request=PhotoUpdateSerializer),
     destroy=extend_schema(tags=["Photos"]),
 )
 class PhotoViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
     queryset = Photo.objects.all()
     parser_classes = [JSONParser, MultiPartParser, FormParser]
-    http_method_names = ["get", "post", "delete"]
+    http_method_names = ["get", "post", "patch", "delete"]
 
     def get_permissions(self):
         if self.action in ["list", "by_ids", "by_category"]:
@@ -42,6 +45,8 @@ class PhotoViewSet(
     def get_serializer_class(self):
         if self.action == "create":
             return PhotoUploadSerializer
+        if self.action == "partial_update":
+            return PhotoUpdateSerializer
         return PhotoSerializer
 
     @extend_schema(

@@ -49,6 +49,15 @@ class PhotoUploadSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
+class PhotoUpdateSerializer(serializers.ModelSerializer):
+    alt_text_i18n = I18NTranslationsField(help_text="Translated alt texts keyed by language code.")
+
+    class Meta:
+        model = Photo
+        fields = ["id", "alt_text_i18n"]
+        read_only_fields = ["id"]
+
+
 class PhotoIdsRequestSerializer(serializers.Serializer):
     ids = serializers.ListField(
         child=serializers.IntegerField(min_value=1),
