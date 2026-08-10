@@ -12,8 +12,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
+      POSTGRES_HOST: lidmanovi-db
       EMAIL_HOST_USER: ${EMAIL_HOST_USER}
       EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
@@ -37,8 +39,18 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    networks:
+      default:
+        aliases:
+          - lidmanovi-db
     # Not published to the host on purpose: the backend reaches this container over the
-    # internal Docker network by service name ("db"). For a local DB client, use
+    # internal Docker network by the unique "lidmanovi-db" alias. For a local DB client, use
     # `docker compose exec db psql ...` or a temporary port-forward instead of exposing 5432.
 
 volumes:
