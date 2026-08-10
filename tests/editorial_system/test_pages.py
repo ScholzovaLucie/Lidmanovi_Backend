@@ -85,6 +85,23 @@ def test_pages_list_is_public_for_unauthenticated_user():
 
 
 @pytest.mark.django_db
+def test_public_pages_list_revalidates_unchanged_content():
+    Page.objects.create(path="/kontakt", lang="cs", content_json={"title": "Kontakt"})
+    client = APIClient()
+
+    first_response = client.get("/editorial_system/pages/?path=/kontakt&lang=cs")
+    cached_response = client.get(
+        "/editorial_system/pages/?path=/kontakt&lang=cs",
+        HTTP_IF_NONE_MATCH=first_response["ETag"],
+    )
+
+    assert first_response.status_code == 200
+    assert first_response["Cache-Control"] == "public, max-age=300, must-revalidate"
+    assert cached_response.status_code == 304
+    assert cached_response["ETag"] == first_response["ETag"]
+
+
+@pytest.mark.django_db
 def test_pages_create_requires_authentication():
     client = APIClient()
 

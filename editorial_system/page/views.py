@@ -1,3 +1,7 @@
+import hashlib
+import json
+
+from django.http import HttpResponseNotModified
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from rest_framework import status, viewsets
@@ -66,6 +70,27 @@ class PageViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(lang=source_lang)
 
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        if request.user.is_authenticated:
+            return response
+
+        # Public page content changes rarely. Let browsers reuse it, while the
+        # content-derived ETag makes edits visible as soon as it is revalidated.
+        serialized = json.dumps(response.data, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        etag = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+        if request.headers.get("If-None-Match", "").strip('"') == etag:
+            not_modified = HttpResponseNotModified()
+            not_modified["ETag"] = f'"{etag}"'
+            not_modified["Cache-Control"] = "public, max-age=300, must-revalidate"
+            not_modified["Vary"] = "Accept-Language"
+            return not_modified
+
+        response["ETag"] = f'"{etag}"'
+        response["Cache-Control"] = "public, max-age=300, must-revalidate"
+        response["Vary"] = "Accept-Language"
+        return response
 
     @extend_schema(
         tags=["Pages"],

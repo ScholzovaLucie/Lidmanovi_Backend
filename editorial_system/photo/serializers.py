@@ -5,13 +5,26 @@ from common.schema import I18NTranslationsField
 from editorial_system.photo.models import Photo, PhotoPlacement
 
 
+def build_image_variants(url):
+    if not url or "res.cloudinary.com" not in url or "/upload/" not in url:
+        return {"thumbnail": url, "card": url, "full": url}
+
+    prefix, suffix = url.split("/upload/", 1)
+    return {
+        "thumbnail": f"{prefix}/upload/f_webp,q_auto,c_fill,w_480,h_320/{suffix}",
+        "card": f"{prefix}/upload/f_webp,q_auto,c_limit,w_1600/{suffix}",
+        "full": url,
+    }
+
+
 class PhotoSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
+    variants = serializers.SerializerMethodField()
     alt_text_i18n = I18NTranslationsField(help_text="Translated alt texts keyed by language code.")
 
     class Meta:
         model = Photo
-        fields = ["id", "category", "url", "alt_text_i18n"]
+        fields = ["id", "category", "url", "variants", "alt_text_i18n"]
 
     def get_url(self, obj):
         request = self.context.get("request")
@@ -26,6 +39,9 @@ class PhotoSerializer(serializers.ModelSerializer):
             return relative_url
 
         return request.build_absolute_uri(relative_url)
+
+    def get_variants(self, obj):
+        return build_image_variants(self.get_url(obj))
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

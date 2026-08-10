@@ -1,5 +1,8 @@
+from io import BytesIO
+
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
 from rest_framework.test import APIClient
 
 from editorial_system.photo.models import Photo
@@ -13,8 +16,10 @@ def public_client():
     return APIClient()
 
 
-def create_test_image(name="photo.jpg", content=b"fake-image-content"):
-    return SimpleUploadedFile(name=name, content=content, content_type="image/jpeg")
+def create_test_image(name="photo.jpg"):
+    content = BytesIO()
+    Image.new("RGB", (1, 1), color="white").save(content, format="JPEG")
+    return SimpleUploadedFile(name=name, content=content.getvalue(), content_type="image/jpeg")
 
 
 def test_list_photos_returns_ids_urls_and_categories(public_client, settings, tmp_path):
@@ -30,6 +35,7 @@ def test_list_photos_returns_ids_urls_and_categories(public_client, settings, tm
     assert payload[0]["id"] == photo.id
     assert payload[0]["category"] == "wellness"
     assert payload[0]["url"].endswith(".jpg")
+    assert payload[0]["variants"]["card"] == payload[0]["url"]
 
 
 def test_by_ids_returns_only_requested_photos_in_same_order(public_client, settings, tmp_path):
