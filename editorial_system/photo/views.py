@@ -110,9 +110,13 @@ class PhotoViewSet(
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
+            alt_text = request.data.get("alt_text", "")
+
             created_photos = []
             for image in images:
-                serializer = self.get_serializer(data={"category": category, "image": image})
+                serializer = self.get_serializer(
+                    data={"category": category, "image": image, "alt_text": alt_text}
+                )
                 serializer.is_valid(raise_exception=True)
                 created_photos.append(serializer.save())
 

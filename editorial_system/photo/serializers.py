@@ -8,7 +8,7 @@ class PhotoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Photo
-        fields = ["id", "category", "url"]
+        fields = ["id", "category", "url", "alt_text"]
 
     def get_url(self, obj):
         request = self.context.get("request")
@@ -28,7 +28,7 @@ class PhotoSerializer(serializers.ModelSerializer):
 class PhotoUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Photo
-        fields = ["id", "category", "image"]
+        fields = ["id", "category", "image", "alt_text"]
         read_only_fields = ["id"]
 
 
