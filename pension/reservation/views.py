@@ -22,6 +22,44 @@ from pension.reservation.serializers import (
 
 LOGGER_EMAIL = logging.getLogger("emails")
 
+BULK_IMPORT_DESCRIPTION = """
+Hromadně vytvoří rezervace z nahraného `.xlsx` souboru.
+
+**Princip:** jeden řádek = jeden pokoj. Řádky se stejným `booking_reference` tvoří dohromady jednu
+rezervaci (víc pokojů v jedné rezervaci).
+
+**Sloupce hlavičky** (přesně tyto názvy, `snake_case`):
+
+| Sloupec | Povinné | Formát | Poznámka |
+|---|---|---|---|
+| `booking_reference` | Ano | text, unikátní v souboru | spojuje řádky do jedné rezervace |
+| `check_in_date` | Ano | `YYYY-MM-DD` nebo `DD.MM.YYYY` | musí být stejné pro celou skupinu |
+| `check_out_date` | Ano | `YYYY-MM-DD` nebo `DD.MM.YYYY` | pozdější než `check_in_date` |
+| `room_name` | Ano | přesný název existujícího aktivního pokoje | case-sensitive shoda s `Room.name` |
+| `room_num_adults` | Ano | celé číslo ≥ 1 | počet dospělých v tomto pokoji |
+| `room_num_children` | Ne | celé číslo ≥ 0, výchozí `0` | počet dětí v tomto pokoji |
+| `guest_first_name` | Ano | text | jméno hlavního hosta |
+| `guest_last_name` | Ano | text | příjmení hlavního hosta |
+| `guest_email` | Ne | e-mail | slouží k dohledání existujícího hosta |
+| `guest_phone` | Ne | text | |
+| `guest_country` | Ne | text | |
+| `guest_note` | Ne | text | poznámka u hosta |
+| `status` | Ne | `new`/`confirmed`/`cancelled`/`payment_pending`/`payed`/`done`, výchozí `new` | |
+| `currency` | Ne | text, výchozí `CZK` | |
+| `note` | Ne | text | poznámka u rezervace |
+| `number` | Ne | text, unikátní | jinak se vygeneruje automaticky |
+| `price` | Ne | číslo | jinak se dopočítá z ceníku pokojů a počtu nocí |
+
+**Validace:** `check_out_date` > `check_in_date`, žádný duplicitní pokoj v jedné skupině, dostatečná
+kapacita pokojů, kontrola překryvu termínů s existujícími rezervacemi, existence a aktivita pokoje,
+shoda sdílených polí (datumy, host, status, ...) napříč řádky se stejným `booking_reference`.
+
+Každá `booking_reference` skupina se zpracovává samostatně (vlastní DB transakce) — jedna vadná
+rezervace se přeskočí a objeví se v `skipped`, zbytek souboru se naimportuje normálně.
+
+Plná dokumentace s ukázkovými daty: `docs/reservation_bulk_import.md` v repozitáři.
+""".strip()
+
 
 def _get_room_names(reservation):
     return ", ".join(reservation.rooms.values_list('name', flat=True))
@@ -367,6 +405,8 @@ class PrivateReservationViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin
 
     @extend_schema(
         tags=['Reservations'],
+        summary='Bulk import reservations from an .xlsx file',
+        description=BULK_IMPORT_DESCRIPTION,
         request={
             'multipart/form-data': {
                 'type': 'object',
