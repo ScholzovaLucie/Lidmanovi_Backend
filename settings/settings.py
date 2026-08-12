@@ -27,9 +27,21 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    'lidmanovi-be.bajerlukas.cz'
+    host.strip()
+    for host in os.getenv(
+        "ALLOWED_HOSTS",
+        "localhost,127.0.0.1,lidmanovi-be.bajerlukas.cz"
+    ).split(",")
+    if host.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "CSRF_TRUSTED_ORIGINS",
+        ""
+    ).split(",")
+    if origin.strip()
 ]
 
 if not DEBUG:
@@ -71,11 +83,16 @@ MIDDLEWARE = [
 ]
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3001",
-    "http://127.0.0.1:5174",
-    "http://localhost:5173",
-    "https://lidmanovi-fe.bajerlukas.cz",
-    "https://lidmanovi-fe-k361.onrender.com",
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:3001,"
+        "http://127.0.0.1:5174,"
+        "http://localhost:5173,"
+        "https://lidmanovi-fe.bajerlukas.cz,"
+        "https://lidmanovi-fe-k361.onrender.com"
+    ).split(",")
+    if origin.strip()
 ]
 
 ROOT_URLCONF = 'settings.urls'
