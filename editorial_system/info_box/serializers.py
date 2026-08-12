@@ -24,8 +24,21 @@ class InfoBoxSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
         extra_kwargs = {
             "starts_at": {"help_text": "Optional start date-time when the info box becomes visible."},
-            "ends_at": {"help_text": "Optional end date-time when the info box stops being visible."},
+            "ends_at": {
+                "help_text": "Optional end date-time when the info box stops being visible. "
+                              "For a single-day info box, set this to the end of that day "
+                              "(e.g. 23:59), not the same time as starts_at."
+            },
         }
+
+    def validate(self, attrs):
+        starts_at = attrs.get("starts_at", getattr(self.instance, "starts_at", None))
+        ends_at = attrs.get("ends_at", getattr(self.instance, "ends_at", None))
+        if starts_at and ends_at and ends_at <= starts_at:
+            raise serializers.ValidationError(
+                "ends_at must be after starts_at, otherwise the info box will never be shown."
+            )
+        return attrs
 
     def get_is_active(self, instance):
         # Kept in sync with PublicInfoBoxViewSet.get_queryset's starts_at/ends_at filtering.
