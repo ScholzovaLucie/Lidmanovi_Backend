@@ -15,7 +15,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      POSTGRES_HOST: ${POSTGRES_HOST:-lidmanovi-db}
+      POSTGRES_HOST: lidmanovi-db
       EMAIL_HOST_USER: ${EMAIL_HOST_USER}
       EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
