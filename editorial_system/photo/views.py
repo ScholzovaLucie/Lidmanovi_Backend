@@ -1,9 +1,9 @@
 import json
 import logging
+from concurrent.futures import ThreadPoolExecutor
 
 import cloudinary.exceptions
 from django.core.exceptions import TooManyFilesSent
-from django.db import transaction
 
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
@@ -23,6 +23,10 @@ from editorial_system.photo.serializers import (
 )
 
 LOGGER = logging.getLogger(__name__)
+
+# Uploading images to Cloudinary one at a time would multiply request time by the
+# batch size; a small thread pool overlaps those network waits instead.
+MAX_UPLOAD_WORKERS = 6
 
 
 @extend_schema_view(
@@ -132,19 +136,21 @@ class PhotoViewSet(
                         status=status.HTTP_400_BAD_REQUEST,
                     )
 
-            created_photos = []
+            serializers = []
+            for image in images:
+                serializer = self.get_serializer(
+                    data={
+                        "category": category,
+                        "image": image,
+                        "alt_text_i18n": alt_text_i18n,
+                    }
+                )
+                serializer.is_valid(raise_exception=True)
+                serializers.append(serializer)
+
             try:
-                with transaction.atomic():
-                    for image in images:
-                        serializer = self.get_serializer(
-                            data={
-                                "category": category,
-                                "image": image,
-                                "alt_text_i18n": alt_text_i18n,
-                            }
-                        )
-                        serializer.is_valid(raise_exception=True)
-                        created_photos.append(serializer.save())
+                with ThreadPoolExecutor(max_workers=min(len(serializers), MAX_UPLOAD_WORKERS)) as executor:
+                    created_photos = list(executor.map(lambda s: s.save(), serializers))
             except cloudinary.exceptions.Error as exc:
                 LOGGER.error("Cloudinary upload failed: %s", exc)
                 return Response(
