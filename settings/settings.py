@@ -75,6 +75,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5174",
     "http://localhost:5173",
     "https://lidmanovi-fe.bajerlukas.cz",
+    "https://lidmanovi-fe-k361.onrender.com",
 ]
 
 ROOT_URLCONF = 'settings.urls'
