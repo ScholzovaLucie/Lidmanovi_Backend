@@ -89,7 +89,7 @@ CORS_ALLOWED_ORIGINS = [
         "http://localhost:3001,"
         "http://127.0.0.1:5174,"
         "http://localhost:5173,"
-        "https://lidmanovi-fe.bajerlukas.cz,"
+        "https://ulidmanu.bajerlukas.cz,"
         "https://lidmanovi-fe-k361.onrender.com"
     ).split(",")
     if origin.strip()
