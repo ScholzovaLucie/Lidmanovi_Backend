@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: backend
+    container_name: ulidmanu-be
     volumes:
       - .:/app
     ports:
@@ -32,7 +32,7 @@ services:
   db:
     restart: always
     image: postgres:16
-    container_name: postgres
+    container_name: ulidmanu-db
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
