@@ -14,6 +14,7 @@ class Room(models.Model):
     price_for_adult = models.PositiveIntegerField(default=0, null=False)
     price_for_children = models.PositiveIntegerField(default=0, null=False)
     is_active = models.BooleanField(default=True)
+    amenities = models.JSONField(default=list, blank=True)
 
     def __str__(self):
         return self.name

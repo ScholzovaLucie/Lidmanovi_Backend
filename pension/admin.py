@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils import timezone
 
+from pension.amenity.models import AmenityIcon
 from pension.guest.models import Guest
 from pension.reservation.models import Reservation
 from pension.room.models import Room
@@ -29,6 +30,15 @@ class ReservationAdmin(admin.ModelAdmin):
     search_fields = ('number', 'primary_guest__first_name', 'primary_guest__last_name', 'primary_guest__email')
     date_hierarchy = 'check_in_date'
     raw_id_fields = ('primary_guest',)
+
+
+@admin.register(AmenityIcon)
+class AmenityIconAdmin(admin.ModelAdmin):
+    list_display = ('key', 'label', 'order', 'is_active')
+    list_editable = ('order', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('key', 'label')
+    ordering = ('order', 'id')
 
 
 @admin.register(VoucherAmount)

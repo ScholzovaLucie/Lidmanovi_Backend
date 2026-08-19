@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from common.i18n import extract_requested_language, resolve_translated_value
 from common.schema import I18NTranslationsField
+from pension.amenity.models import AmenityIcon
 from pension.room.models import Room
 
 
@@ -23,6 +24,7 @@ class RoomSerializer(serializers.ModelSerializer):
             "price_for_adult",
             "price_for_children",
             "is_active",
+            "amenities",
         ]
         read_only_fields = ["id"]
         extra_kwargs = {
@@ -34,7 +36,25 @@ class RoomSerializer(serializers.ModelSerializer):
             "price_for_adult": {"help_text": "Per-night price for one adult in CZK."},
             "price_for_children": {"help_text": "Per-night price for one child in CZK."},
             "is_active": {"help_text": "Whether the room can be offered in reservations."},
+            "amenities": {"help_text": "List of amenity icons, e.g. [{'icon': 'tv', 'text': 'Smart TV'}]."},
         }
+
+    def validate_amenities(self, value):
+        if not isinstance(value, list):
+            raise serializers.ValidationError("amenities musí být seznam.")
+
+        valid_keys = set(AmenityIcon.objects.values_list("key", flat=True))
+
+        for item in value:
+            if not isinstance(item, dict):
+                raise serializers.ValidationError("Každá položka musí být objekt {icon, text}.")
+            icon = item.get("icon")
+            text = item.get("text", "")
+            if icon not in valid_keys:
+                raise serializers.ValidationError(f"Neplatná ikona '{icon}'.")
+            if not isinstance(text, str):
+                raise serializers.ValidationError("Pole 'text' musí být řetězec.")
+        return value
 
 
 class PublicRoomSerializer(serializers.ModelSerializer):
@@ -50,6 +70,7 @@ class PublicRoomSerializer(serializers.ModelSerializer):
             "price_for_adult",
             "price_for_children",
             "is_active",
+            "amenities",
         ]
         read_only_fields = fields
 

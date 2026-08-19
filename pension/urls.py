@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 
+from pension.amenity.views import AmenityIconViewSet
 from pension.guest.views import GuestViewSet
 from pension.place_rating.views import PlaceRatingView
 from pension.reservation.views import PublicReservationViewSet, PrivateReservationViewSet
@@ -11,6 +12,7 @@ router = routers.DefaultRouter()
 router.register(r'public/rooms', PublicRoomViewSet, basename='public-rooms')
 router.register(r'admin/rooms', PrivateRoomViewSet, basename='admin-rooms')
 router.register(r'admin/guests', GuestViewSet, basename='guests')
+router.register(r'admin/amenity-icons', AmenityIconViewSet, basename='amenity-icons')
 router.register(r'public/reservations', PublicReservationViewSet, basename='public-reservations')
 router.register(r'admin/reservations', PrivateReservationViewSet, basename='admin-reservations')
 router.register(r'public/vouchers', PublicVoucherViewSet, basename='public-vouchers')
