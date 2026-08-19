@@ -41,8 +41,6 @@ def test_serializer_rejects_invalid_date_range():
     room = Room.objects.create(
         name="Pokoj logic-1",
         capacity=3,
-        max_adults=2,
-        max_children=1,
         price_for_adult=1000,
         price_for_children=500,
     )
@@ -59,8 +57,6 @@ def test_serializer_reuses_same_guest_for_multiple_reservations():
     room = Room.objects.create(
         name="Pokoj logic-2",
         capacity=3,
-        max_adults=2,
-        max_children=1,
         price_for_adult=1000,
         price_for_children=500,
     )
@@ -89,8 +85,6 @@ def test_serializer_autofills_total_people_from_rooms_when_missing():
     room = Room.objects.create(
         name="Pokoj logic-3",
         capacity=3,
-        max_adults=2,
-        max_children=1,
         price_for_adult=1000,
         price_for_children=500,
     )
@@ -110,8 +104,6 @@ def test_validate_rooms_rejects_overlapping_reservation():
     room = Room.objects.create(
         name="Pokoj logic-4",
         capacity=3,
-        max_adults=2,
-        max_children=1,
         price_for_adult=1000,
         price_for_children=500,
     )
@@ -145,8 +137,6 @@ def test_calculate_price_uses_room_rates_and_nights():
     room = Room.objects.create(
         name="Pokoj logic-5",
         capacity=4,
-        max_adults=3,
-        max_children=2,
         price_for_adult=1000,
         price_for_children=500,
     )
@@ -172,8 +162,6 @@ def test_serializer_rejects_duplicate_room_ids():
     room = Room.objects.create(
         name="Pokoj logic-6",
         capacity=3,
-        max_adults=2,
-        max_children=1,
         price_for_adult=1000,
         price_for_children=500,
     )
@@ -204,8 +192,6 @@ def test_serializer_rejects_mismatched_total_people_vs_rooms_breakdown():
     room = Room.objects.create(
         name="Pokoj logic-7",
         capacity=3,
-        max_adults=2,
-        max_children=1,
         price_for_adult=1000,
         price_for_children=500,
     )
@@ -230,8 +216,6 @@ def test_serializer_rejects_inactive_room():
     room = Room.objects.create(
         name="Pokoj logic-8",
         capacity=3,
-        max_adults=2,
-        max_children=1,
         price_for_adult=1000,
         price_for_children=500,
         is_active=False,
@@ -270,16 +254,12 @@ def test_calculate_price_uses_multiple_rooms_and_nights():
     first_room = Room.objects.create(
         name="Pokoj logic-9a",
         capacity=3,
-        max_adults=2,
-        max_children=1,
         price_for_adult=1000,
         price_for_children=500,
     )
     second_room = Room.objects.create(
         name="Pokoj logic-9b",
         capacity=2,
-        max_adults=1,
-        max_children=1,
         price_for_adult=800,
         price_for_children=200,
     )

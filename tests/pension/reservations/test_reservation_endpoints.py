@@ -202,27 +202,27 @@ def test_duplicit_reservation_in_sa_day(auth_client, room, guest):
 
 
 @pytest.mark.django_db
-def test_room_capacity_too_many_adults(auth_client, room):
+def test_room_capacity_exceeded_with_only_adults(auth_client, room):
     guest_data = Guest(first_name="Test", last_name="User", email="overadults@example.com")
     payload = reservation_payload(
         room,
         guest_data,
-        num_adults=room.max_adults + 1,
+        num_adults=room.capacity + 1,
         num_children=0,
-        rooms=[{"id": room.id, "num_adults": room.max_adults + 1, "num_children": 0}],
+        rooms=[{"id": room.id, "num_adults": room.capacity + 1, "num_children": 0}],
     )
     resp = auth_client.post("/pension/public/reservations/create/", payload, format="json")
     assert resp.status_code == 400
 
 @pytest.mark.django_db
-def test_room_capacity_too_many_children(auth_client, room):
+def test_room_capacity_exceeded_with_mostly_children(auth_client, room):
     guest_data = Guest(first_name="Test", last_name="User", email="overchildren@example.com")
     payload = reservation_payload(
         room,
         guest_data,
         num_adults=1,
-        num_children=room.max_children + 1,
-        rooms=[{"id": room.id, "num_adults": 1, "num_children": room.max_children + 1}],
+        num_children=room.capacity,
+        rooms=[{"id": room.id, "num_adults": 1, "num_children": room.capacity}],
     )
     resp = auth_client.post("/pension/public/reservations/create/", payload, format="json")
     assert resp.status_code == 400
@@ -452,8 +452,6 @@ def test_create_reservation_rejects_inactive_room(auth_client, guest):
     inactive_room = Room.objects.create(
         name="Inactive room",
         capacity=2,
-        max_adults=2,
-        max_children=0,
         price_for_adult=900,
         price_for_children=0,
         is_active=False,
@@ -503,16 +501,12 @@ def test_create_reservation_calculates_price_for_multiple_rooms(auth_client, gue
     first_room = Room.objects.create(
         name="Multi room A",
         capacity=3,
-        max_adults=2,
-        max_children=1,
         price_for_adult=1000,
         price_for_children=500,
     )
     second_room = Room.objects.create(
         name="Multi room B",
         capacity=2,
-        max_adults=1,
-        max_children=1,
         price_for_adult=800,
         price_for_children=200,
     )

@@ -87,10 +87,10 @@ def test_bulk_import_creates_single_room_reservation(staff_client, room):
 @pytest.mark.django_db
 def test_bulk_import_groups_multi_room_booking_by_reference(staff_client):
     room_a = Room.objects.create(
-        name="Room A", capacity=2, max_adults=2, max_children=0, price_for_adult=1000, price_for_children=0,
+        name="Room A", capacity=2, price_for_adult=1000, price_for_children=0,
     )
     room_b = Room.objects.create(
-        name="Room B", capacity=2, max_adults=2, max_children=0, price_for_adult=800, price_for_children=0,
+        name="Room B", capacity=2, price_for_adult=800, price_for_children=0,
     )
     upload = build_upload([
         row(room_name=room_a.name, room_num_adults=2),

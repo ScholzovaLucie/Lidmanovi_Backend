@@ -6,8 +6,6 @@ from pension.reservation.enums import ReservationStatus
 class Room(models.Model):
     name = models.CharField(max_length=50, unique=True, null=False)
     name_i18n = models.JSONField(default=dict, blank=True)
-    max_adults = models.PositiveIntegerField(default=1, null=False)
-    max_children = models.PositiveIntegerField(default=0, null=False)
     capacity = models.PositiveIntegerField(default=1, null=False)
     description = models.TextField(blank=True)
     description_i18n = models.JSONField(default=dict, blank=True)
@@ -20,13 +18,7 @@ class Room(models.Model):
         return self.name
 
     def can_fit(self, adults, children):
-        if adults > self.max_adults:
-            return False
-        if children > self.max_children:
-            return False
-        if adults + children > self.capacity:
-            return False
-        return True
+        return adults + children <= self.capacity
 
     def calculate_price_per_day(self, adults, children):
         price = 0

@@ -65,15 +65,15 @@ def test_room_available_when_dates_touch_at_boundary(auth_client, room, guest):
     assert response.data["available"] is True
 
 @pytest.mark.django_db
-def test_room_capacity_too_many_adults(auth_client, room):
-    url = f"/pension/public/rooms/{room.id}/availability/?from_date=2026-02-10&to_date=2026-02-12&adults={room.max_adults+1}&children=0"
+def test_room_capacity_exceeded_with_only_adults(auth_client, room):
+    url = f"/pension/public/rooms/{room.id}/availability/?from_date=2026-02-10&to_date=2026-02-12&adults={room.capacity+1}&children=0"
     response = auth_client.get(url)
     assert response.status_code == 200
     assert response.data["available"] is False
 
 @pytest.mark.django_db
-def test_room_capacity_too_many_children(auth_client, room):
-    url = f"/pension/public/rooms/{room.id}/availability/?from_date=2026-02-10&to_date=2026-02-12&adults=1&children={room.max_children+1}"
+def test_room_capacity_exceeded_with_only_children(auth_client, room):
+    url = f"/pension/public/rooms/{room.id}/availability/?from_date=2026-02-10&to_date=2026-02-12&adults=1&children={room.capacity}"
     response = auth_client.get(url)
     assert response.status_code == 200
     assert response.data["available"] is False

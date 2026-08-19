@@ -11,8 +11,6 @@ def test_admin_update_changes_status_and_persists(staff_client, mock_emails):
     room = Room.objects.create(
         name="Test room for update",
         capacity=4,
-        max_adults=2,
-        max_children=2,
         price_for_adult=1000,
         price_for_children=500,
     )

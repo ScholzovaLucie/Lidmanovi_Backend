@@ -157,9 +157,7 @@ class PublicRoomViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewse
 
         single_room_options = [
             r for r in available_rooms
-            if r.max_adults >= adults
-            and r.max_children >= children
-            and (r.max_adults + r.max_children) >= total_people
+            if r.can_fit(adults, children)
         ]
 
         if single_room_options:

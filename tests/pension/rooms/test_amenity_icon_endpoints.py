@@ -95,8 +95,6 @@ def test_deactivating_amenity_icon_does_not_break_existing_room(auth_client, roo
         f"/pension/admin/rooms/{room.id}/",
         {
             "name": room.name,
-            "max_adults": room.max_adults,
-            "max_children": room.max_children,
             "capacity": room.capacity,
             "description": room.description,
             "price_for_adult": room.price_for_adult,

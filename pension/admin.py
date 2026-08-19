@@ -17,7 +17,7 @@ class GuestAdmin(admin.ModelAdmin):
 
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ('name', 'capacity', 'max_adults', 'max_children', 'price_for_adult', 'price_for_children', 'is_active')
+    list_display = ('name', 'capacity', 'price_for_adult', 'price_for_children', 'is_active')
     list_filter = ('is_active',)
     search_fields = ('name', 'description')
 

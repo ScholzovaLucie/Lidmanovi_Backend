@@ -32,8 +32,6 @@ def test_can_create_multiple_operations_for_one_client(auth_client, mock_emails)
     room = Room.objects.create(
         name="Pokoj 101",
         capacity=3,
-        max_adults=2,
-        max_children=1,
         price_for_adult=1000,
         price_for_children=500,
     )

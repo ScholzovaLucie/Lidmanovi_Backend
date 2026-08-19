@@ -16,8 +16,6 @@ class RoomSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "name_i18n",
-            "max_adults",
-            "max_children",
             "capacity",
             "description",
             "description_i18n",
@@ -30,9 +28,7 @@ class RoomSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "name": {"help_text": "Default room name, usually in the source language."},
             "description": {"help_text": "Default room description, usually in the source language."},
-            "max_adults": {"help_text": "Maximum number of adults that fit into the room."},
-            "max_children": {"help_text": "Maximum number of children that fit into the room."},
-            "capacity": {"help_text": "Maximum total guest capacity for the room."},
+            "capacity": {"help_text": "Total number of beds / guests the room can accommodate."},
             "price_for_adult": {"help_text": "Per-night price for one adult in CZK."},
             "price_for_children": {"help_text": "Per-night price for one child in CZK."},
             "is_active": {"help_text": "Whether the room can be offered in reservations."},
@@ -63,8 +59,6 @@ class PublicRoomSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
-            "max_adults",
-            "max_children",
             "capacity",
             "description",
             "price_for_adult",

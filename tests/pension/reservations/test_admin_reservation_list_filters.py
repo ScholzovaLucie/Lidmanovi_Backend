@@ -28,8 +28,6 @@ def test_admin_list_filters_by_reservation_date_range(auth_client):
     room = Room.objects.create(
         name="Room A",
         capacity=2,
-        max_adults=2,
-        max_children=0,
         price_for_adult=1000,
         price_for_children=0,
     )
@@ -70,16 +68,12 @@ def test_admin_list_filters_by_status_and_room(auth_client):
     room_1 = Room.objects.create(
         name="Room C",
         capacity=2,
-        max_adults=2,
-        max_children=0,
         price_for_adult=1200,
         price_for_children=0,
     )
     room_2 = Room.objects.create(
         name="Room D",
         capacity=2,
-        max_adults=2,
-        max_children=0,
         price_for_adult=1300,
         price_for_children=0,
     )
@@ -125,8 +119,6 @@ def test_admin_list_filters_by_primary_guest_email_and_last_name(auth_client):
     room = Room.objects.create(
         name="Room E",
         capacity=2,
-        max_adults=2,
-        max_children=0,
         price_for_adult=1500,
         price_for_children=0,
     )
@@ -180,8 +172,6 @@ def test_admin_list_filters_by_primary_guest_id(auth_client):
     room = Room.objects.create(
         name="Room F",
         capacity=2,
-        max_adults=2,
-        max_children=0,
         price_for_adult=1100,
         price_for_children=0,
     )
@@ -219,8 +209,6 @@ def test_admin_list_filters_by_search_text_across_string_fields(auth_client):
     room = Room.objects.create(
         name="Panorama Deluxe",
         capacity=2,
-        max_adults=2,
-        max_children=0,
         price_for_adult=1700,
         price_for_children=0,
         description="Pokoj s vyhledem",
@@ -282,8 +270,6 @@ def test_admin_by_status_returns_paginated_results(auth_client):
     room = Room.objects.create(
         name="Room G",
         capacity=2,
-        max_adults=2,
-        max_children=0,
         price_for_adult=1400,
         price_for_children=0,
     )
@@ -321,8 +307,6 @@ def test_admin_list_returns_reservations_from_newest_to_oldest(auth_client):
     room = Room.objects.create(
         name="Room H",
         capacity=2,
-        max_adults=2,
-        max_children=0,
         price_for_adult=1000,
         price_for_children=0,
     )

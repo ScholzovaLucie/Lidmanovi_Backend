@@ -28,8 +28,6 @@ def test_public_room_list_includes_amenities(auth_client, room):
 def test_admin_create_room_with_amenities(auth_client):
     payload = {
         "name": "Amenity room",
-        "max_adults": 2,
-        "max_children": 1,
         "capacity": 3,
         "description": "Room with amenities",
         "price_for_adult": 1000,
@@ -52,8 +50,6 @@ def test_admin_update_room_with_amenities(auth_client, room):
         f"/pension/admin/rooms/{room.id}/",
         {
             "name": room.name,
-            "max_adults": room.max_adults,
-            "max_children": room.max_children,
             "capacity": room.capacity,
             "description": room.description,
             "price_for_adult": room.price_for_adult,
@@ -76,8 +72,6 @@ def test_admin_update_room_rejects_invalid_icon(auth_client, room):
         f"/pension/admin/rooms/{room.id}/",
         {
             "name": room.name,
-            "max_adults": room.max_adults,
-            "max_children": room.max_children,
             "capacity": room.capacity,
             "description": room.description,
             "price_for_adult": room.price_for_adult,
@@ -98,8 +92,6 @@ def test_admin_update_room_rejects_non_string_text(auth_client, room):
         f"/pension/admin/rooms/{room.id}/",
         {
             "name": room.name,
-            "max_adults": room.max_adults,
-            "max_children": room.max_children,
             "capacity": room.capacity,
             "description": room.description,
             "price_for_adult": room.price_for_adult,
@@ -119,8 +111,6 @@ def test_room_amenities_default_is_empty_list():
     room = Room.objects.create(
         name="Default amenities room",
         capacity=2,
-        max_adults=2,
-        max_children=0,
         price_for_adult=1000,
         price_for_children=0,
     )
