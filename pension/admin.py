@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from pension.amenity.models import AmenityIcon
 from pension.guest.models import Guest
+from pension.nearby_place.models import NearbyPlace
 from pension.reservation.models import Reservation
 from pension.room.models import Room
 from pension.voucher.models import VoucherAmount, VoucherOrder
@@ -38,6 +39,15 @@ class AmenityIconAdmin(admin.ModelAdmin):
     list_editable = ('order', 'is_active')
     list_filter = ('is_active',)
     search_fields = ('key', 'label')
+    ordering = ('order', 'id')
+
+
+@admin.register(NearbyPlace)
+class NearbyPlaceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'link', 'media_type', 'order', 'is_active')
+    list_editable = ('order', 'is_active')
+    list_filter = ('media_type', 'is_active')
+    search_fields = ('name',)
     ordering = ('order', 'id')
 
 
