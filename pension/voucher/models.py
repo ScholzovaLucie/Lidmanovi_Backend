@@ -21,12 +21,23 @@ class VoucherAmount(models.Model):
 
 
 class VoucherOrder(models.Model):
+    class DeliveryMethod(models.TextChoices):
+        EMAIL = "email", "E-mail"
+        PRINT = "print", "Tištěná podoba"
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     number = models.CharField(max_length=20, unique=True)
 
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=10, default="CZK")
+
+    delivery_method = models.CharField(
+        max_length=10,
+        choices=DeliveryMethod.choices,
+        default=DeliveryMethod.EMAIL,
+        help_text="Whether the voucher should be sent by email or in printed form.",
+    )
 
     note = models.TextField(blank=True)
 

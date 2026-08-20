@@ -51,9 +51,9 @@ class VoucherAmountAdmin(admin.ModelAdmin):
 
 @admin.register(VoucherOrder)
 class VoucherOrderAdmin(admin.ModelAdmin):
-    list_display = ('number', 'guest', 'amount', 'currency', 'created_at', 'is_sent', 'sent_at')
+    list_display = ('number', 'guest', 'amount', 'currency', 'delivery_method', 'created_at', 'is_sent', 'sent_at')
     list_editable = ('is_sent',)
-    list_filter = ('is_sent', 'currency')
+    list_filter = ('is_sent', 'currency', 'delivery_method')
     search_fields = ('number', 'guest__first_name', 'guest__last_name', 'guest__email')
     date_hierarchy = 'created_at'
     raw_id_fields = ('guest',)

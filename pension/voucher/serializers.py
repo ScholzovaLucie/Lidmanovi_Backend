@@ -48,6 +48,7 @@ class VoucherOrderReadSerializer(serializers.ModelSerializer):
             'created_at',
             'amount',
             'currency',
+            'delivery_method',
             'note',
             'guest',
             'is_sent',
@@ -69,9 +70,11 @@ class VoucherOrderCreateSerializer(serializers.ModelSerializer):
         fields = [
             'guest',
             'amount_id',
+            'delivery_method',
             'note',
         ]
         extra_kwargs = {
+            "delivery_method": {"help_text": "Whether the voucher should be sent by email or in printed form."},
             "note": {"help_text": "Optional note for the voucher order."},
         }
 
