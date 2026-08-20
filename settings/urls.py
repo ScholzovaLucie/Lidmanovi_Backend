@@ -26,6 +26,7 @@ from drf_spectacular.views import (
 from emails.views import SendEmailView
 from health import health_check
 from user.views import ThrottledTokenObtainPairView, ThrottledTokenRefreshView
+from pension.app_setting.views import AppSettingsView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,6 +38,7 @@ urlpatterns = [
     path('pension/', include('pension.urls')),
     path('user/', include('user.urls')),
     path('editorial_system/', include('editorial_system.urls')),
+    path('app-settings/', AppSettingsView.as_view(), name='app-settings'),
 
     path("api/token/", ThrottledTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", ThrottledTokenRefreshView.as_view(), name="token_refresh"),
