@@ -63,7 +63,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_spectacular',
-    'pension',
+    'pension.apps.PensionConfig',
     'editorial_system',
     'corsheaders',
     'cloudinary',

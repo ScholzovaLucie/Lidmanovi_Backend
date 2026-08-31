@@ -15,6 +15,19 @@ class VoucherAmountSerializer(serializers.ModelSerializer):
         ]
 
 
+class AdminVoucherAmountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VoucherAmount
+        fields = [
+            'id',
+            'value',
+            'currency',
+            'is_active',
+            'sort_order',
+        ]
+        read_only_fields = ['id']
+
+
 class VoucherGuestSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(help_text="Guest email address.")
 

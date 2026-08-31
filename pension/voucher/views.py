@@ -14,6 +14,7 @@ from emails.services import send_templated_email
 from pension.voucher.enums import VoucherStatus
 from pension.voucher.models import STATUS_MAP_TO_MAIL, VoucherAmount, VoucherOrder
 from pension.voucher.serializers import (
+    AdminVoucherAmountSerializer,
     VoucherAmountSerializer,
     VoucherOrderCreateSerializer,
     VoucherOrderReadSerializer,
@@ -57,7 +58,7 @@ class PublicVoucherViewSet(viewsets.GenericViewSet):
     )
     @decorators.action(detail=False, methods=['get'], url_path='amounts')
     def get_amounts(self, request):
-        amounts = VoucherAmount.objects.filter(is_active=True)
+        amounts = VoucherAmount.objects.filter(is_active=True, deleted_at__isnull=True)
         return Response(VoucherAmountSerializer(amounts, many=True).data)
 
     @extend_schema(
@@ -102,6 +103,32 @@ class PublicVoucherViewSet(viewsets.GenericViewSet):
 
         read_serializer = VoucherOrderReadSerializer(voucher_order)
         return Response(read_serializer.data)
+
+
+@extend_schema_view(
+    list=extend_schema(tags=['Vouchers']),
+    retrieve=extend_schema(tags=['Vouchers']),
+    create=extend_schema(tags=['Vouchers']),
+    update=extend_schema(tags=['Vouchers']),
+    destroy=extend_schema(tags=['Vouchers']),
+)
+class AdminVoucherAmountViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = VoucherAmount.objects.filter(deleted_at__isnull=True)
+    serializer_class = AdminVoucherAmountSerializer
+    permission_classes = [IsAdminUser]
+    pagination_class = None
+    http_method_names = ['get', 'post', 'put', 'delete']
+
+    def perform_destroy(self, instance):
+        instance.deleted_at = timezone.now()
+        instance.save(update_fields=['deleted_at'])
 
 
 @extend_schema_view(

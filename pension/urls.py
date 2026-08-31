@@ -7,7 +7,7 @@ from pension.nearby_place.views import AdminNearbyPlaceViewSet, PublicNearbyPlac
 from pension.place_rating.views import PlaceRatingView
 from pension.reservation.views import PublicReservationViewSet, PrivateReservationViewSet
 from pension.room.views import PublicRoomViewSet, PrivateRoomViewSet
-from pension.voucher.views import PublicVoucherViewSet, PrivateVoucherViewSet
+from pension.voucher.views import AdminVoucherAmountViewSet, PublicVoucherViewSet, PrivateVoucherViewSet
 
 router = routers.DefaultRouter()
 router.register(r'public/rooms', PublicRoomViewSet, basename='public-rooms')
@@ -18,6 +18,7 @@ router.register(r'public/reservations', PublicReservationViewSet, basename='publ
 router.register(r'admin/reservations', PrivateReservationViewSet, basename='admin-reservations')
 router.register(r'public/vouchers', PublicVoucherViewSet, basename='public-vouchers')
 router.register(r'admin/vouchers', PrivateVoucherViewSet, basename='admin-vouchers')
+router.register(r'admin/voucher-amounts', AdminVoucherAmountViewSet, basename='admin-voucher-amounts')
 router.register(r'public/nearby-places', PublicNearbyPlaceViewSet, basename='public-nearby-places')
 router.register(r'admin/nearby-places', AdminNearbyPlaceViewSet, basename='admin-nearby-places')
 

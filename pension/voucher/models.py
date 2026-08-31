@@ -20,6 +20,7 @@ class VoucherAmount(models.Model):
     currency = models.CharField(max_length=10, default="CZK")
     is_active = models.BooleanField(default=True)
     sort_order = models.PositiveIntegerField(default=0)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["sort_order", "value"]
