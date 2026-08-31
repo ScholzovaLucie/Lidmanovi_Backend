@@ -48,4 +48,5 @@ def test_can_create_multiple_operations_for_one_client(auth_client, mock_emails)
 
     guest = Guest.objects.get(email="klient@example.com")
     assert Reservation.objects.filter(primary_guest=guest).count() == 2
-    assert mock_emails.call_count == 2
+    # 2 reservations x (guest confirmation + admin notification)
+    assert mock_emails.call_count == 4

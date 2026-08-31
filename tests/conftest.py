@@ -4,6 +4,7 @@ from django.core.cache import cache
 from rest_framework.test import APIClient
 from pension.room.models import Room
 from pension.guest.models import Guest
+from pension.voucher.models import VoucherAmount
 from unittest.mock import Mock
 
 @pytest.fixture
@@ -44,6 +45,11 @@ def guest():
 
 
 @pytest.fixture
+def voucher_amount():
+    return VoucherAmount.objects.create(value=1000, currency="CZK", is_active=True)
+
+
+@pytest.fixture
 def staff_client(staff_user):
     client = APIClient()
     client.force_authenticate(user=staff_user)
@@ -63,5 +69,6 @@ def _reset_throttle_cache():
 def mock_emails(monkeypatch):
     mocked_sender = Mock()
     monkeypatch.setattr("pension.reservation.views.send_templated_email", mocked_sender)
+    monkeypatch.setattr("pension.voucher.views.send_templated_email", mocked_sender)
     monkeypatch.setattr("emails.views.send_templated_email", mocked_sender)
     return mocked_sender

@@ -16,6 +16,8 @@ class VoucherAmountSerializer(serializers.ModelSerializer):
 
 
 class VoucherGuestSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(help_text="Guest email address.")
+
     class Meta:
         model = Guest
         fields = [
@@ -30,7 +32,6 @@ class VoucherGuestSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "first_name": {"help_text": "Guest first name."},
             "last_name": {"help_text": "Guest last name."},
-            "email": {"help_text": "Guest email address."},
             "phone": {"help_text": "Guest phone number."},
             "country": {"help_text": "Guest country."},
             "note": {"help_text": "Additional guest note."},
@@ -46,12 +47,17 @@ class VoucherOrderReadSerializer(serializers.ModelSerializer):
             'id',
             'number',
             'created_at',
+            'status',
             'amount',
             'currency',
             'delivery_method',
+            'shipping_street',
+            'shipping_house_number',
+            'shipping_city',
+            'shipping_postal_code',
+            'shipping_country',
             'note',
             'guest',
-            'is_sent',
             'sent_at',
         ]
 
@@ -71,12 +77,42 @@ class VoucherOrderCreateSerializer(serializers.ModelSerializer):
             'guest',
             'amount_id',
             'delivery_method',
+            'shipping_street',
+            'shipping_house_number',
+            'shipping_city',
+            'shipping_postal_code',
+            'shipping_country',
             'note',
         ]
         extra_kwargs = {
             "delivery_method": {"help_text": "Whether the voucher should be sent by email or in printed form."},
+            "shipping_street": {"help_text": "Street name. Required when delivery_method is 'print'."},
+            "shipping_house_number": {"help_text": "House number. Required when delivery_method is 'print'."},
+            "shipping_city": {"help_text": "City. Required when delivery_method is 'print'."},
+            "shipping_postal_code": {"help_text": "Postal code. Required when delivery_method is 'print'."},
+            "shipping_country": {"help_text": "Country. Required when delivery_method is 'print'."},
             "note": {"help_text": "Optional note for the voucher order."},
         }
+
+    def validate(self, data):
+        delivery_method = data.get('delivery_method') or VoucherOrder.DeliveryMethod.EMAIL
+        if delivery_method == VoucherOrder.DeliveryMethod.PRINT:
+            address_fields = [
+                'shipping_street',
+                'shipping_house_number',
+                'shipping_city',
+                'shipping_postal_code',
+                'shipping_country',
+            ]
+            errors = {
+                field: ["This field is required when delivery_method is 'print'."]
+                for field in address_fields
+                if not data.get(field)
+            }
+            if errors:
+                raise serializers.ValidationError(errors)
+
+        return data
 
     def create(self, validated_data):
         guest_data = validated_data.pop('guest')
@@ -96,3 +132,22 @@ class VoucherOrderCreateSerializer(serializers.ModelSerializer):
             currency=amount_choice.currency,
             **validated_data,
         )
+
+
+class VoucherOrderUpdateSerializer(serializers.ModelSerializer):
+    status = serializers.ChoiceField(
+        choices=VoucherOrder._meta.get_field('status').choices,
+        required=False,
+        allow_null=True,
+    )
+
+    class Meta:
+        model = VoucherOrder
+        fields = [
+            'status',
+        ]
+
+
+class VoucherOrderStatusSerializer(serializers.Serializer):
+    value = serializers.CharField(help_text="Voucher order status machine value.")
+    label = serializers.CharField(help_text="Voucher order status human-readable label.")

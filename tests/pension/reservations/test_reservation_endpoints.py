@@ -54,6 +54,21 @@ def test_create_reservation(auth_client, room, guest):
     assert response.data["num_adults"] == 2
 
 @pytest.mark.django_db
+def test_create_reservation_notifies_admin(auth_client, room, guest, mock_emails, settings):
+    payload = reservation_payload(room, guest)
+
+    response = auth_client.post("/pension/public/reservations/create/", payload, format="json")
+
+    assert response.status_code == 200
+    assert mock_emails.call_count == 2
+    admin_calls = [
+        call for call in mock_emails.call_args_list
+        if call.kwargs["email_type"] == "admin_new_reservation"
+    ]
+    assert len(admin_calls) == 1
+    assert admin_calls[0].kwargs["recipient"] == settings.ADMIN_NOTIFICATION_EMAIL
+
+@pytest.mark.django_db
 def test_reservation_collision(auth_client, room, guest):
     create_existing_reservation(
         room=room,

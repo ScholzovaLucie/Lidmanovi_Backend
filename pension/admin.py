@@ -6,6 +6,7 @@ from pension.guest.models import Guest
 from pension.nearby_place.models import NearbyPlace
 from pension.reservation.models import Reservation
 from pension.room.models import Room
+from pension.voucher.enums import VoucherStatus
 from pension.voucher.models import VoucherAmount, VoucherOrder
 
 
@@ -61,15 +62,15 @@ class VoucherAmountAdmin(admin.ModelAdmin):
 
 @admin.register(VoucherOrder)
 class VoucherOrderAdmin(admin.ModelAdmin):
-    list_display = ('number', 'guest', 'amount', 'currency', 'delivery_method', 'created_at', 'is_sent', 'sent_at')
-    list_editable = ('is_sent',)
-    list_filter = ('is_sent', 'currency', 'delivery_method')
+    list_display = ('number', 'guest', 'amount', 'currency', 'delivery_method', 'status', 'created_at', 'sent_at')
+    list_editable = ('status',)
+    list_filter = ('status', 'currency', 'delivery_method')
     search_fields = ('number', 'guest__first_name', 'guest__last_name', 'guest__email')
     date_hierarchy = 'created_at'
     raw_id_fields = ('guest',)
     readonly_fields = ('number', 'created_at', 'sent_at')
 
     def save_model(self, request, obj, form, change):
-        if change and 'is_sent' in form.changed_data:
-            obj.sent_at = timezone.now() if obj.is_sent else None
+        if change and 'status' in form.changed_data and obj.status == VoucherStatus.SENT and not obj.sent_at:
+            obj.sent_at = timezone.now()
         super().save_model(request, obj, form, change)

@@ -15,6 +15,11 @@ TEMPLATES = {
     EmailType.RESERVATION_PAYD: "emails/reservation_payd.html",
     EmailType.RESERVATION_DONE: "emails/reservation_done.html",
     EmailType.VOUCHER_ORDER_RECEIVED: "emails/voucher_order_received.html",
+    EmailType.VOUCHER_ORDER_CONFIRMED: "emails/voucher_order_confirmed.html",
+    EmailType.VOUCHER_ORDER_SENT: "emails/voucher_order_sent.html",
+    EmailType.VOUCHER_ORDER_CANCELLED: "emails/voucher_order_cancelled.html",
+    EmailType.ADMIN_NEW_RESERVATION: "emails/admin_new_reservation.html",
+    EmailType.ADMIN_NEW_VOUCHER_ORDER: "emails/admin_new_voucher_order.html",
     EmailType.GENERIC: "emails/generic_message.html",
 }
 
@@ -25,6 +30,11 @@ SUBJECTS = {
     EmailType.RESERVATION_PAYD: "Rezervace zaplacena – Restaurace u Lidmanů",
     EmailType.RESERVATION_DONE: "Rezervace dokončena – Restaurace u Lidmanů",
     EmailType.VOUCHER_ORDER_RECEIVED: "Objednávka poukazu přijata – Restaurace u Lidmanů",
+    EmailType.VOUCHER_ORDER_CONFIRMED: "Objednávka poukazu potvrzena – Restaurace u Lidmanů",
+    EmailType.VOUCHER_ORDER_SENT: "Poukaz odeslán – Restaurace u Lidmanů",
+    EmailType.VOUCHER_ORDER_CANCELLED: "Objednávka poukazu zrušena – Restaurace u Lidmanů",
+    EmailType.ADMIN_NEW_RESERVATION: "Nová rezervace – Restaurace u Lidmanů",
+    EmailType.ADMIN_NEW_VOUCHER_ORDER: "Nová objednávka poukazu – Restaurace u Lidmanů",
     EmailType.GENERIC: "Zpráva z Restaurace u Lidmanů",
 }
 

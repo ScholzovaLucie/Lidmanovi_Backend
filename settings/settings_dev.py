@@ -11,3 +11,5 @@ DATABASES = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_PORT = 587
+
+ADMIN_NOTIFICATION_EMAIL = 'admin@test.local'

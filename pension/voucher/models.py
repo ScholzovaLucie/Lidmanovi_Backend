@@ -5,6 +5,14 @@ from django.db import models
 from django.utils import timezone
 
 from pension.guest.models import Guest
+from pension.voucher.enums import VoucherStatus
+
+
+STATUS_MAP_TO_MAIL = {
+    VoucherStatus.CONFIRMED: "voucher_order_confirmed",
+    VoucherStatus.SENT: "voucher_order_sent",
+    VoucherStatus.CANCELLED: "voucher_order_cancelled",
+}
 
 
 class VoucherAmount(models.Model):
@@ -29,6 +37,13 @@ class VoucherOrder(models.Model):
 
     number = models.CharField(max_length=20, unique=True)
 
+    status = models.CharField(
+        max_length=20,
+        choices=VoucherStatus.choices,
+        default=VoucherStatus.NEW,
+        db_index=True,
+    )
+
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=10, default="CZK")
 
@@ -39,6 +54,12 @@ class VoucherOrder(models.Model):
         help_text="Whether the voucher should be sent by email or in printed form.",
     )
 
+    shipping_street = models.CharField(max_length=255, blank=True)
+    shipping_house_number = models.CharField(max_length=20, blank=True)
+    shipping_city = models.CharField(max_length=100, blank=True)
+    shipping_postal_code = models.CharField(max_length=20, blank=True)
+    shipping_country = models.CharField(max_length=100, blank=True)
+
     note = models.TextField(blank=True)
 
     guest = models.ForeignKey(
@@ -48,11 +69,11 @@ class VoucherOrder(models.Model):
         help_text="The guest who ordered the voucher",
     )
 
-    is_sent = models.BooleanField(
-        default=False,
-        help_text="Check off once the voucher has been sent to the customer.",
+    sent_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When the voucher order status was set to 'sent'.",
     )
-    sent_at = models.DateTimeField(null=True, blank=True)
 
     _MAX_NUMBER_ATTEMPTS = 10
 
@@ -71,6 +92,15 @@ class VoucherOrder(models.Model):
         if not self.number:
             self.number = self._generate_number()
         super().save(*args, **kwargs)
+
+    @property
+    def full_shipping_address(self):
+        if not self.shipping_street:
+            return ""
+        return (
+            f"{self.shipping_street} {self.shipping_house_number}, "
+            f"{self.shipping_postal_code} {self.shipping_city}, {self.shipping_country}"
+        )
 
     def __str__(self):
         return self.number

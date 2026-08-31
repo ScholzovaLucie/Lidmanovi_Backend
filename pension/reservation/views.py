@@ -1,6 +1,7 @@
 import logging
 from io import BytesIO
 
+from django.conf import settings
 from django.db.models import Q
 from drf_spectacular.plumbing import build_basic_type
 from rest_framework import viewsets, decorators, mixins, serializers, status
@@ -100,12 +101,13 @@ class PublicReservationViewSet(viewsets.GenericViewSet):
         instance = read_serializer.instance
 
         room_names = ", ".join(r['name'] for r in data['rooms'])
+        guest_name = f"{instance.primary_guest.first_name} {instance.primary_guest.last_name}"
 
         send_templated_email(
             email_type="reservation_received",
             recipient=instance.primary_guest.email,
             context={
-                "name": f"{instance.primary_guest.first_name} {instance.primary_guest.last_name}",
+                "name": guest_name,
                 "date_from": instance.check_in_date,
                 "date_to": instance.check_out_date,
                 "adults": instance.num_adults,
@@ -114,6 +116,23 @@ class PublicReservationViewSet(viewsets.GenericViewSet):
                 "room_type": room_names,
             },
         )
+
+        if settings.ADMIN_NOTIFICATION_EMAIL:
+            send_templated_email(
+                email_type="admin_new_reservation",
+                recipient=settings.ADMIN_NOTIFICATION_EMAIL,
+                context={
+                    "number": instance.number,
+                    "guest_name": guest_name,
+                    "guest_email": instance.primary_guest.email,
+                    "date_from": instance.check_in_date,
+                    "date_to": instance.check_out_date,
+                    "adults": instance.num_adults,
+                    "children": instance.num_children,
+                    "price": instance.price,
+                    "room_type": room_names,
+                },
+            )
 
         return Response(data)
 
