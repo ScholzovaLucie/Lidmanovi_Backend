@@ -238,6 +238,12 @@ DATA_UPLOAD_MAX_NUMBER_FILES = 60
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "emails": {
+            "format": "[{asctime}] {levelname} {name}: {message}",
+            "style": "{",
+        },
+    },
     "handlers": {
         "email_file": {
             "level": "INFO",
@@ -245,11 +251,19 @@ LOGGING = {
             "filename": "logs/emails.log",
             "maxBytes": 1024 * 1024 * 5,  # 5 MB
             "backupCount": 3,
+            "formatter": "emails",
+        },
+        "email_console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "emails",
         },
     },
     "loggers": {
         "emails": {
-            "handlers": ["email_file"],
+            # email_console ensures failures show up in stdout-based log viewers (e.g. Render),
+            # since the app's filesystem is ephemeral there and email_file alone is invisible.
+            "handlers": ["email_file", "email_console"],
             "level": "INFO",
             "propagate": False,
         },
