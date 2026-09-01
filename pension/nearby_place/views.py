@@ -28,4 +28,4 @@ class AdminNearbyPlaceViewSet(viewsets.ModelViewSet):
     serializer_class = NearbyPlaceSerializer
     permission_classes = [IsAdminUser]
     pagination_class = None
-    http_method_names = ["get", "post", "patch", "delete"]
+    http_method_names = ["get", "post", "put", "patch", "delete"]
