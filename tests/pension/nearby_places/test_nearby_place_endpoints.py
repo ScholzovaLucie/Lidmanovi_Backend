@@ -54,6 +54,32 @@ def test_create_iframe_place_requires_media_url(auth_client):
     assert "media_url" in response.data
 
 
+def test_create_place_with_long_google_maps_link_succeeds(auth_client):
+    # Regression test: `link`/`media_url` used to be plain URLField() with the Django
+    # default max_length=200, but real Google Maps place links (the documented use case
+    # for `link`) routinely exceed that, causing a Postgres "value too long for type
+    # character varying(200)" DataError instead of a clean validation response.
+    long_maps_url = (
+        "https://www.google.com/maps/place/Pension+-+Restaurace+U+Lidmanu/"
+        "@50.497506,16.291047,17z/data=!3m1!4b1!4m6!3m5!"
+        "1s0x470e686d9f1caccd:0x5443aff885131f52!8m2!3d50.497506!4d16.2936219"
+        "!16s%2Fg%2F1tfr_s_l?entry=ttu&g_ep=EgoyMDI2MDYyNC4wIKXMDSoASAFQAw%3D%3D"
+    )
+    assert len(long_maps_url) > 200
+
+    payload = {
+        "name_i18n": {"cs": "Aquapark"},
+        "link": long_maps_url,
+        "media_type": "iframe",
+        "media_url": long_maps_url,
+    }
+
+    response = auth_client.post("/pension/admin/nearby-places/", payload, format="json")
+
+    assert response.status_code == 201
+    assert response.data["link"] == long_maps_url
+
+
 def test_create_place_without_name_field_succeeds(auth_client):
     # Regression test: `name` used to be a required writable field inherited from the
     # model's CharField, but the frontend only ever sends `name_i18n` - it never sends
