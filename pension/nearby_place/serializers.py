@@ -15,6 +15,7 @@ class NearbyPlaceSerializer(serializers.ModelSerializer):
     media_url = serializers.URLField(
         required=False,
         allow_blank=True,
+        max_length=2000,
         help_text=(
             "URL pro vložení do iframe. Povinné pouze pro media_type='iframe'. "
             "Pro media_type='image' je ignorováno – obrázek se čte z photo placement "

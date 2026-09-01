@@ -8,9 +8,13 @@ class NearbyPlace(models.Model):
 
     name = models.CharField(max_length=150)
     name_i18n = models.JSONField(default=dict, blank=True)
-    link = models.URLField(help_text="Odkaz na dané místo (web, Google Maps apod.).")
+    link = models.URLField(
+        max_length=2000,
+        help_text="Odkaz na dané místo (web, Google Maps apod.).",
+    )
     media_type = models.CharField(max_length=10, choices=MediaType.choices, default=MediaType.IMAGE)
     media_url = models.URLField(
+        max_length=2000,
         blank=True,
         help_text=(
             "URL pro vložení do iframe (jen media_type='iframe'). "
