@@ -67,8 +67,6 @@ INSTALLED_APPS = [
     'pension.apps.PensionConfig',
     'editorial_system',
     'corsheaders',
-    'cloudinary',
-    'cloudinary_storage',
     'rest_framework_simplejwt.token_blacklist',
 ]
 
@@ -170,13 +168,13 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = Path(os.environ.get('MEDIA_ROOT', BASE_DIR / 'media'))
 
-CLOUDINARY_STORAGE = {
-    'CLOUDINARY_URL': os.environ.get('CLOUDINARY_URL'),
-}
+# Uploaded photos live on the server's own disk, not in Cloudinary. In production the
+# reverse proxy serves MEDIA_URL straight from MEDIA_ROOT (see deploy/nginx/media.conf);
+# Django only serves it when DEBUG is on (see settings/urls.py).
 STORAGES = {
-    "default": {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"},
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 }
 

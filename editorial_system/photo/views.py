@@ -1,8 +1,6 @@
 import json
 import logging
-from concurrent.futures import ThreadPoolExecutor
 
-import cloudinary.exceptions
 from django.core.exceptions import TooManyFilesSent
 
 from drf_spectacular.types import OpenApiTypes
@@ -23,10 +21,6 @@ from editorial_system.photo.serializers import (
 )
 
 LOGGER = logging.getLogger(__name__)
-
-# Uploading images to Cloudinary one at a time would multiply request time by the
-# batch size; a small thread pool overlaps those network waits instead.
-MAX_UPLOAD_WORKERS = 6
 
 
 @extend_schema_view(
@@ -149,13 +143,14 @@ class PhotoViewSet(
                 serializers.append(serializer)
 
             try:
-                with ThreadPoolExecutor(max_workers=min(len(serializers), MAX_UPLOAD_WORKERS)) as executor:
-                    created_photos = list(executor.map(lambda s: s.save(), serializers))
-            except cloudinary.exceptions.Error as exc:
-                LOGGER.error("Cloudinary upload failed: %s", exc)
+                # Saved serially: these are local disk writes, so there is no network
+                # latency left to overlap with a thread pool.
+                created_photos = [serializer.save() for serializer in serializers]
+            except OSError as exc:
+                LOGGER.error("Storing uploaded image failed: %s", exc)
                 return Response(
                     {"image": ["Image upload failed. Please try again."]},
-                    status=status.HTTP_502_BAD_GATEWAY,
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
             response_serializer = PhotoSerializer(
@@ -169,11 +164,11 @@ class PhotoViewSet(
         serializer.is_valid(raise_exception=True)
         try:
             photo = serializer.save()
-        except cloudinary.exceptions.Error as exc:
-            LOGGER.error("Cloudinary upload failed: %s", exc)
+        except OSError as exc:
+            LOGGER.error("Storing uploaded image failed: %s", exc)
             return Response(
                 {"image": ["Image upload failed. Please try again."]},
-                status=status.HTTP_502_BAD_GATEWAY,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
         response_serializer = PhotoSerializer(photo, context=self.get_serializer_context())
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)

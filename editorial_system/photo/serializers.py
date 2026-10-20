@@ -6,15 +6,10 @@ from editorial_system.photo.models import Photo, PhotoPlacement
 
 
 def build_image_variants(url):
-    if not url or "res.cloudinary.com" not in url or "/upload/" not in url:
-        return {"thumbnail": url, "card": url, "full": url}
-
-    prefix, suffix = url.split("/upload/", 1)
-    return {
-        "thumbnail": f"{prefix}/upload/f_webp,q_auto,c_fill,w_480,h_320/{suffix}",
-        "card": f"{prefix}/upload/f_webp,q_auto,c_limit,w_1600/{suffix}",
-        "full": url,
-    }
+    # Photos are served from the server's own disk, so there is no transformation CDN to
+    # resize them on the fly. The keys stay in the response so clients keep working; they
+    # all point at the stored original until server-side resizing is added.
+    return {"thumbnail": url, "card": url, "full": url}
 
 
 class PhotoSerializer(serializers.ModelSerializer):
